@@ -150,6 +150,151 @@ def buscar_fila_por_serie(hoja, serie, excluir_fila=None):
     return None
 
 
+
+def obtener_registros_inventario(hoja):
+    """Lee todos los colectores guardados desde la fila 3."""
+    filas = hoja.get_all_values()
+    registros = []
+
+    for numero_fila, fila in enumerate(
+        filas[PRIMERA_FILA_DATOS - 1:],
+        start=PRIMERA_FILA_DATOS
+    ):
+        fila = preparar_fila(fila)
+
+        # No cuenta filas completamente vacías.
+        if not any(str(valor).strip() for valor in fila):
+            continue
+
+        registros.append(
+            {
+                "fila": numero_fila,
+                "item": fila[0],
+                "serie": fila[1],
+                "estado": fila[2],
+                "ubicacion": fila[3],
+                "usuario_asignado": fila[4],
+                "accesorio": fila[5],
+                "reasignacion": fila[6],
+                "condicion": fila[7],
+                "observacion": fila[8]
+            }
+        )
+
+    return registros
+
+
+def crear_resumen(registros):
+    """Genera los totales mostrados en la parte superior."""
+    resumen = {
+        "total": len(registros),
+        "localizados": 0,
+        "no_localizados": 0,
+        "extraviados": 0,
+        "con_usuario": 0,
+        "reasignar": 0,
+        "operativos": 0,
+        "reparacion_defectuosos": 0
+    }
+
+    for equipo in registros:
+        estado = normalizar_texto(equipo["estado"])
+        reasignacion = normalizar_texto(equipo["reasignacion"])
+        condicion = normalizar_texto(equipo["condicion"])
+
+        if estado == "localizado":
+            resumen["localizados"] += 1
+        elif estado == "no localizado":
+            resumen["no_localizados"] += 1
+        elif estado == "extraviado":
+            resumen["extraviados"] += 1
+
+        if reasignacion == "con usuario":
+            resumen["con_usuario"] += 1
+        elif reasignacion == "reasignar":
+            resumen["reasignar"] += 1
+
+        if condicion == "operativo":
+            resumen["operativos"] += 1
+
+        if (
+            "reparacion" in condicion
+            or "reparación" in condicion
+            or "defectuoso" in condicion
+            or "fuera de servicio" in condicion
+        ):
+            resumen["reparacion_defectuosos"] += 1
+
+    return resumen
+
+
+def crear_opciones_filtros(registros):
+    """Obtiene automáticamente las opciones existentes en Google Sheets."""
+    def valores_unicos(campo):
+        valores = {
+            str(equipo[campo]).strip()
+            for equipo in registros
+            if str(equipo[campo]).strip()
+        }
+        return sorted(valores, key=lambda valor: valor.casefold())
+
+    return {
+        "estados": valores_unicos("estado"),
+        "ubicaciones": valores_unicos("ubicacion"),
+        "reasignaciones": valores_unicos("reasignacion"),
+        "condiciones": valores_unicos("condicion")
+    }
+
+
+def contexto_inventario(resultados=None, consulta="", filtros=None):
+    """Prepara estadísticas, filtros y resultados para colector.html."""
+    filtros = filtros or {
+        "estado": "",
+        "ubicacion": "",
+        "reasignacion": "",
+        "condicion": ""
+    }
+
+    try:
+        hoja = obtener_hoja()
+        registros = obtener_registros_inventario(hoja)
+
+        return {
+            "resultados": resultados if resultados is not None else [],
+            "consulta": consulta,
+            "filtros": filtros,
+            "resumen": crear_resumen(registros),
+            "opciones": crear_opciones_filtros(registros),
+            "nombre_usuario": session.get("nombre_usuario")
+        }
+
+    except Exception as error:
+        print("Error al cargar el resumen del inventario:", error)
+
+        return {
+            "resultados": resultados if resultados is not None else [],
+            "consulta": consulta,
+            "filtros": filtros,
+            "resumen": {
+                "total": 0,
+                "localizados": 0,
+                "no_localizados": 0,
+                "extraviados": 0,
+                "con_usuario": 0,
+                "reasignar": 0,
+                "operativos": 0,
+                "reparacion_defectuosos": 0
+            },
+            "opciones": {
+                "estados": [],
+                "ubicaciones": [],
+                "reasignaciones": [],
+                "condiciones": []
+            },
+            "nombre_usuario": session.get("nombre_usuario")
+        }
+
+
 # ==========================================
 # CREDENCIALES
 # ==========================================
@@ -235,12 +380,9 @@ def login():
 @app.route("/sistema")
 @login_requerido
 def inicio():
-
     return render_template(
         "colector.html",
-        resultados=[],
-        consulta="",
-        nombre_usuario=session.get("nombre_usuario")
+        **contexto_inventario()
     )
 
 
@@ -268,9 +410,7 @@ def colector():
     if request.method == "GET":
         return render_template(
             "colector.html",
-            resultados=[],
-            consulta="",
-            nombre_usuario=session.get("nombre_usuario")
+            **contexto_inventario()
         )
 
     datos = obtener_datos_formulario()
@@ -331,80 +471,99 @@ def colector():
 def buscar_colector():
 
     consulta = request.args.get("consulta", "").strip()
-    resultados = []
 
-    if not consulta:
-        return render_template(
-            "colector.html",
-            resultados=[],
-            consulta="",
-            nombre_usuario=session.get("nombre_usuario")
-        )
+    filtros = {
+        "estado": request.args.get("estado", "").strip(),
+        "ubicacion": request.args.get("ubicacion", "").strip(),
+        "reasignacion": request.args.get("reasignacion", "").strip(),
+        "condicion": request.args.get("condicion", "").strip()
+    }
+
+    resultados = []
 
     try:
         hoja = obtener_hoja()
-        filas = hoja.get_all_values()
+        registros = obtener_registros_inventario(hoja)
         consulta_normalizada = normalizar_texto(consulta)
 
-        # Se omiten las filas 1 y 2.
-        # Los datos comienzan desde la fila 3.
-        for numero_fila, fila in enumerate(
-            filas[PRIMERA_FILA_DATOS - 1:],
-            start=PRIMERA_FILA_DATOS
-        ):
-            fila = preparar_fila(fila)
-
-            item = fila[0]
-            serie = fila[1]
-            estado = fila[2]
-            ubicacion = fila[3]
-            usuario_asignado = fila[4]
-            accesorio = fila[5]
-            reasignacion = fila[6]
-            condicion = fila[7]
-            observacion = fila[8]
-
-            serie_normalizada = normalizar_texto(serie)
+        for equipo in registros:
+            serie_normalizada = normalizar_texto(equipo["serie"])
             usuario_normalizado = normalizar_texto(
-                usuario_asignado
+                equipo["usuario_asignado"]
             )
 
-            coincide_serie = (
-                len(consulta_normalizada) >= 6
-                and serie_normalizada.endswith(
-                    consulta_normalizada
+            coincide_consulta = True
+
+            if consulta_normalizada:
+                coincide_serie = (
+                    len(consulta_normalizada) >= 6
+                    and serie_normalizada.endswith(
+                        consulta_normalizada
+                    )
                 )
-            )
 
-            coincide_usuario = (
-                consulta_normalizada in usuario_normalizado
-            )
-
-            if coincide_serie or coincide_usuario:
-                resultados.append(
-                    {
-                        "fila": numero_fila,
-                        "item": item,
-                        "serie": serie,
-                        "estado": estado,
-                        "ubicacion": ubicacion,
-                        "usuario_asignado": usuario_asignado,
-                        "accesorio": accesorio,
-                        "reasignacion": reasignacion,
-                        "condicion": condicion,
-                        "observacion": observacion
-                    }
+                coincide_usuario = (
+                    consulta_normalizada in usuario_normalizado
                 )
+
+                coincide_consulta = (
+                    coincide_serie or coincide_usuario
+                )
+
+            coincide_estado = (
+                not filtros["estado"]
+                or normalizar_texto(equipo["estado"])
+                == normalizar_texto(filtros["estado"])
+            )
+
+            coincide_ubicacion = (
+                not filtros["ubicacion"]
+                or normalizar_texto(equipo["ubicacion"])
+                == normalizar_texto(filtros["ubicacion"])
+            )
+
+            coincide_reasignacion = (
+                not filtros["reasignacion"]
+                or normalizar_texto(equipo["reasignacion"])
+                == normalizar_texto(filtros["reasignacion"])
+            )
+
+            coincide_condicion = (
+                not filtros["condicion"]
+                or normalizar_texto(equipo["condicion"])
+                == normalizar_texto(filtros["condicion"])
+            )
+
+            if (
+                coincide_consulta
+                and coincide_estado
+                and coincide_ubicacion
+                and coincide_reasignacion
+                and coincide_condicion
+            ):
+                resultados.append(equipo)
+
+        contexto = {
+            "resultados": resultados,
+            "consulta": consulta,
+            "filtros": filtros,
+            "resumen": crear_resumen(registros),
+            "opciones": crear_opciones_filtros(registros),
+            "nombre_usuario": session.get("nombre_usuario")
+        }
 
     except Exception as error:
-        print("Error al buscar en Google Sheets:", error)
-        flash("No se pudo realizar la búsqueda.", "error")
+        print("Error al filtrar en Google Sheets:", error)
+        flash("No se pudo realizar el filtro.", "error")
+        contexto = contexto_inventario(
+            resultados=[],
+            consulta=consulta,
+            filtros=filtros
+        )
 
     return render_template(
         "colector.html",
-        resultados=resultados,
-        consulta=consulta,
-        nombre_usuario=session.get("nombre_usuario")
+        **contexto
     )
 
 
