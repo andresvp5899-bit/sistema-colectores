@@ -416,15 +416,16 @@ def buscar_colector():
             serie_normalizada = serie.lower()
             usuario_normalizado = usuario_asignado.lower()
 
-            # Toma solamente los últimos 6 caracteres
-            # del número de serie registrado.
-            ultimos_seis = serie_normalizada[-6:]
-
+            # La búsqueda por serie acepta desde 6 caracteres
+            # hasta el número de serie completo.
+            # Siempre compara desde el final de la serie registrada.
             coincide_serie = (
-                len(consulta_normalizada) == 6
-                and consulta_normalizada == ultimos_seis
+                len(consulta_normalizada) >= 6
+                and serie_normalizada.endswith(consulta_normalizada)
             )
 
+            # La búsqueda por usuario sigue funcionando por nombre
+            # o por una parte del nombre, aunque tenga menos de 6 caracteres.
             coincide_usuario = (
                 consulta_normalizada
                 in usuario_normalizado
@@ -465,6 +466,178 @@ def buscar_colector():
         consulta=consulta,
         nombre_usuario=session.get(
             "nombre_usuario"
+        )
+    )
+
+
+
+# ==========================================
+# EDITAR COLECTOR EXISTENTE
+# ==========================================
+
+@app.route("/editar-colector", methods=["POST"])
+@login_requerido
+def editar_colector():
+
+    fila_texto = request.form.get(
+        "fila",
+        ""
+    ).strip()
+
+    item = request.form.get(
+        "item",
+        ""
+    ).strip()
+
+    serie = request.form.get(
+        "serie",
+        ""
+    ).strip()
+
+    estado = request.form.get(
+        "estado",
+        ""
+    ).strip()
+
+    ubicacion = request.form.get(
+        "ubicacion",
+        ""
+    ).strip()
+
+    usuario = request.form.get(
+        "usuario_asignado",
+        ""
+    ).strip()
+
+    accesorio = request.form.get(
+        "accesorio",
+        ""
+    ).strip()
+
+    reasignacion = request.form.get(
+        "reasignacion",
+        ""
+    ).strip()
+
+    condicion = request.form.get(
+        "condicion",
+        ""
+    ).strip()
+
+    observacion = request.form.get(
+        "observacion",
+        ""
+    ).strip()
+
+    consulta = request.form.get(
+        "consulta",
+        ""
+    ).strip()
+
+    if not fila_texto.isdigit():
+
+        flash(
+            "La fila seleccionada no es válida.",
+            "error"
+        )
+
+        return redirect(
+            url_for(
+                "buscar_colector",
+                consulta=consulta
+            )
+        )
+
+    numero_fila = int(fila_texto)
+
+    # Las filas 1 y 2 corresponden a encabezados.
+    if numero_fila < 3:
+
+        flash(
+            "No se puede modificar una fila de encabezado.",
+            "error"
+        )
+
+        return redirect(
+            url_for(
+                "buscar_colector",
+                consulta=consulta
+            )
+        )
+
+    if not serie:
+
+        flash(
+            "El número de serie es obligatorio.",
+            "error"
+        )
+
+        return redirect(
+            url_for(
+                "buscar_colector",
+                consulta=consulta
+            )
+        )
+
+    try:
+
+        hoja = obtener_hoja()
+
+        # Se vuelve a consultar la fila antes de actualizarla.
+        # Esto evita escribir fuera del rango de datos.
+        fila_actual = hoja.row_values(numero_fila)
+
+        if not fila_actual:
+
+            flash(
+                "El registro ya no existe en Google Sheets.",
+                "error"
+            )
+
+            return redirect(
+                url_for(
+                    "buscar_colector",
+                    consulta=consulta
+                )
+            )
+
+        hoja.update(
+            range_name=f"A{numero_fila}:I{numero_fila}",
+            values=[[
+                item,
+                serie,
+                estado,
+                ubicacion,
+                usuario,
+                accesorio,
+                reasignacion,
+                condicion,
+                observacion
+            ]],
+            value_input_option="USER_ENTERED"
+        )
+
+        flash(
+            "Los datos del colector se actualizaron correctamente.",
+            "exito"
+        )
+
+    except Exception as error:
+
+        print(
+            "Error al actualizar Google Sheets:",
+            error
+        )
+
+        flash(
+            "No se pudieron guardar los cambios.",
+            "error"
+        )
+
+    return redirect(
+        url_for(
+            "buscar_colector",
+            consulta=consulta or serie[-6:]
         )
     )
 
