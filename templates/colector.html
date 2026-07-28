@@ -83,8 +83,8 @@
                     <h2>Buscar colector</h2>
 
                     <p>
-                        Ingresa los últimos 6 caracteres del número de serie
-                        o el nombre del usuario asignado.
+                        Ingresa 6 o más caracteres del número de serie,
+                        la serie completa o el nombre del usuario asignado.
                     </p>
                 </div>
 
@@ -103,7 +103,7 @@
                 <div class="campo-busqueda">
 
                     <label for="consulta">
-                        Últimos 6 caracteres o usuario asignado
+                        6 o más caracteres de la serie o usuario asignado
                     </label>
 
                     <input
@@ -185,13 +185,12 @@
                                     <div class="identificacion-equipo">
 
                                         <div class="icono-equipo">
-                                            📦
+                                            ✏️
                                         </div>
 
                                         <div>
                                             <span class="etiqueta-equipo">
-                                                {{ equipo.estado or
-                                                   'Estado no registrado' }}
+                                                EDICIÓN DEL REGISTRO
                                             </span>
 
                                             <h3>
@@ -203,78 +202,199 @@
                                     </div>
 
                                     <span class="numero-item">
-                                        Item {{ equipo.item or '-' }}
+                                        Fila {{ equipo.fila }}
                                     </span>
 
                                 </div>
 
-                                <div class="datos-equipo">
+                                <form
+                                    action="{{ url_for('editar_colector') }}"
+                                    method="POST"
+                                    class="formulario formulario-edicion"
+                                >
 
-                                    <div class="dato">
-                                        <span>Número de serie</span>
+                                    <input
+                                        type="hidden"
+                                        name="fila"
+                                        value="{{ equipo.fila }}"
+                                    >
 
-                                        <strong>
-                                            {{ equipo.serie or '-' }}
-                                        </strong>
+                                    <input
+                                        type="hidden"
+                                        name="consulta"
+                                        value="{{ consulta }}"
+                                    >
+
+                                    <input
+                                        type="hidden"
+                                        name="serie_original"
+                                        value="{{ equipo.serie }}"
+                                    >
+
+                                    <div class="campo">
+
+                                        <label for="editar_item_{{ equipo.fila }}">
+                                            Item
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="editar_item_{{ equipo.fila }}"
+                                            name="item"
+                                            value="{{ equipo.item }}"
+                                            autocomplete="off"
+                                            required
+                                        >
+
                                     </div>
 
-                                    <div class="dato">
-                                        <span>Estado</span>
+                                    <div class="campo">
 
-                                        <strong>
-                                            {{ equipo.estado or '-' }}
-                                        </strong>
+                                        <label for="editar_serie_{{ equipo.fila }}">
+                                            Número de serie
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="editar_serie_{{ equipo.fila }}"
+                                            name="serie"
+                                            value="{{ equipo.serie }}"
+                                            autocomplete="off"
+                                            required
+                                        >
+
                                     </div>
 
-                                    <div class="dato">
-                                        <span>Control de ubicación</span>
+                                    <div class="campo">
 
-                                        <strong>
-                                            {{ equipo.ubicacion or '-' }}
-                                        </strong>
+                                        <label for="editar_estado_{{ equipo.fila }}">
+                                            Estado
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="editar_estado_{{ equipo.fila }}"
+                                            name="estado"
+                                            value="{{ equipo.estado }}"
+                                            list="lista_estado"
+                                            autocomplete="off"
+                                            required
+                                        >
+
                                     </div>
 
-                                    <div class="dato">
-                                        <span>Usuario asignado</span>
+                                    <div class="campo">
 
-                                        <strong>
-                                            {{ equipo.usuario_asignado or '-' }}
-                                        </strong>
+                                        <label for="editar_ubicacion_{{ equipo.fila }}">
+                                            Control de ubicación
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="editar_ubicacion_{{ equipo.fila }}"
+                                            name="ubicacion"
+                                            value="{{ equipo.ubicacion }}"
+                                            list="lista_ubicacion"
+                                            autocomplete="off"
+                                            required
+                                        >
+
                                     </div>
 
-                                    <div class="dato">
-                                        <span>Accesorio</span>
+                                    <div class="campo">
 
-                                        <strong>
-                                            {{ equipo.accesorio or '-' }}
-                                        </strong>
+                                        <label for="editar_usuario_{{ equipo.fila }}">
+                                            Usuario asignado
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="editar_usuario_{{ equipo.fila }}"
+                                            name="usuario_asignado"
+                                            value="{{ equipo.usuario_asignado }}"
+                                            autocomplete="off"
+                                        >
+
                                     </div>
 
-                                    <div class="dato">
-                                        <span>Condición de reasignación</span>
+                                    <div class="campo">
 
-                                        <strong>
-                                            {{ equipo.reasignacion or '-' }}
-                                        </strong>
+                                        <label for="editar_accesorio_{{ equipo.fila }}">
+                                            Accesorio
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="editar_accesorio_{{ equipo.fila }}"
+                                            name="accesorio"
+                                            value="{{ equipo.accesorio }}"
+                                            list="lista_accesorio"
+                                            autocomplete="off"
+                                        >
+
                                     </div>
 
-                                    <div class="dato">
-                                        <span>Condición del colector</span>
+                                    <div class="campo">
 
-                                        <strong>
-                                            {{ equipo.condicion or '-' }}
-                                        </strong>
+                                        <label for="editar_reasignacion_{{ equipo.fila }}">
+                                            Condición de reasignación
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="editar_reasignacion_{{ equipo.fila }}"
+                                            name="reasignacion"
+                                            value="{{ equipo.reasignacion }}"
+                                            list="lista_reasignacion"
+                                            autocomplete="off"
+                                        >
+
                                     </div>
 
-                                    <div class="dato dato-observacion">
-                                        <span>Observación</span>
+                                    <div class="campo">
 
-                                        <strong>
-                                            {{ equipo.observacion or '-' }}
-                                        </strong>
+                                        <label for="editar_condicion_{{ equipo.fila }}">
+                                            Condición del colector
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="editar_condicion_{{ equipo.fila }}"
+                                            name="condicion"
+                                            value="{{ equipo.condicion }}"
+                                            list="lista_condicion"
+                                            autocomplete="off"
+                                        >
+
                                     </div>
 
-                                </div>
+                                    <div class="campo campo-completo">
+
+                                        <label for="editar_observacion_{{ equipo.fila }}">
+                                            Observación
+                                        </label>
+
+                                        <textarea
+                                            id="editar_observacion_{{ equipo.fila }}"
+                                            name="observacion"
+                                            rows="4"
+                                        >{{ equipo.observacion }}</textarea>
+
+                                    </div>
+
+                                    <div class="acciones campo-completo">
+
+                                        <button
+                                            type="submit"
+                                            class="boton-principal"
+                                        >
+                                            <span>💾</span>
+                                            Actualizar colector
+                                        </button>
+
+                                    </div>
+
+                                </form>
 
                             </article>
 
@@ -293,8 +413,8 @@
                         <h3>No se encontraron colectores</h3>
 
                         <p>
-                            Verifica los últimos 6 caracteres de la serie
-                            o el nombre del usuario e intenta nuevamente.
+                            Verifica que hayas escrito al menos 6 caracteres de la serie,
+                            la serie completa o el nombre del usuario.
                         </p>
 
                     </div>
