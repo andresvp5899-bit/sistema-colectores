@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Sistema de Colectores</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='estilos.css') }}"
+    >
+</head>
+
+<body>
+
+    <div class="fondo-decorativo fondo-uno"></div>
+    <div class="fondo-decorativo fondo-dos"></div>
+
+    <main class="pagina">
+
+        <section class="encabezado">
+
+            <div class="icono-principal">
+                📦
+            </div>
+
+            <div class="encabezado-texto">
+                <span class="etiqueta-superior">
+                    INVENTARIO DE ACTIVOS
+                </span>
+
+                <h1>Sistema de Colectores</h1>
+
+                <p>
+                    Registro, búsqueda y administración de colectores
+                </p>
+            </div>
+
+            <a
+                href="{{ url_for('logout') }}"
+                class="boton-cerrar-sesion"
+            >
+                Cerrar sesión
+            </a>
+
+        </section>
+
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+
+            {% if mensajes %}
+
+                <section class="mensajes">
+
+                    {% for categoria, mensaje in mensajes %}
+
+                        <div class="mensaje {{ categoria }}">
+                            {{ mensaje }}
+                        </div>
+
+                    {% endfor %}
+
+                </section>
+
+            {% endif %}
+
+        {% endwith %}
+
+        <section class="tarjeta-buscador">
+
+            <div class="titulo-buscador">
+
+                <div>
+                    <span class="subtitulo-tarjeta">
+                        CONSULTA DE COLECTORES
+                    </span>
+
+                    <h2>Buscar colector</h2>
+
+                    <p>
+                        Ingresa los últimos 6 caracteres del número de serie
+                        o el nombre del usuario asignado.
+                    </p>
+                </div>
+
+                <div class="icono-busqueda">
+                    🔍
+                </div>
+
+            </div>
+
+            <form
+                action="{{ url_for('buscar_colector') }}"
+                method="GET"
+                class="formulario-busqueda"
+            >
+
+                <div class="campo-busqueda">
+
+                    <label for="consulta">
+                        Últimos 6 caracteres o usuario asignado
+                    </label>
+
+                    <input
+                        type="text"
+                        id="consulta"
+                        name="consulta"
+                        value="{{ consulta or '' }}"
+                        placeholder="Ejemplo: 301251 o JULIO BENITEZ"
+                        autocomplete="off"
+                        required
+                    >
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="boton-buscar"
+                >
+                    <span>🔍</span>
+                    Buscar colector
+                </button>
+
+                {% if consulta %}
+
+                    <a
+                        href="{{ url_for('inicio') }}"
+                        class="boton-limpiar-busqueda"
+                    >
+                        Limpiar búsqueda
+                    </a>
+
+                {% endif %}
+
+            </form>
+
+        </section>
+
+        {% if consulta %}
+
+            <section class="seccion-resultados">
+
+                <div class="encabezado-resultados">
+
+                    <div>
+                        <span class="subtitulo-tarjeta">
+                            RESULTADO DE LA CONSULTA
+                        </span>
+
+                        <h2>Colectores encontrados</h2>
+
+                        <p>
+                            Búsqueda realizada por:
+                            <strong>{{ consulta }}</strong>
+                        </p>
+                    </div>
+
+                    <span class="cantidad-resultados">
+                        {{ resultados|length }}
+
+                        {% if resultados|length == 1 %}
+                            colector
+                        {% else %}
+                            colectores
+                        {% endif %}
+                    </span>
+
+                </div>
+
+                {% if resultados %}
+
+                    <div class="lista-resultados">
+
+                        {% for equipo in resultados %}
+
+                            <article class="tarjeta-resultado">
+
+                                <div class="resultado-superior">
+
+                                    <div class="identificacion-equipo">
+
+                                        <div class="icono-equipo">
+                                            📦
+                                        </div>
+
+                                        <div>
+                                            <span class="etiqueta-equipo">
+                                                {{ equipo.estado or
+                                                   'Estado no registrado' }}
+                                            </span>
+
+                                            <h3>
+                                                {{ equipo.usuario_asignado or
+                                                   'Usuario no asignado' }}
+                                            </h3>
+                                        </div>
+
+                                    </div>
+
+                                    <span class="numero-item">
+                                        Item {{ equipo.item or '-' }}
+                                    </span>
+
+                                </div>
+
+                                <div class="datos-equipo">
+
+                                    <div class="dato">
+                                        <span>Número de serie</span>
+
+                                        <strong>
+                                            {{ equipo.serie or '-' }}
+                                        </strong>
+                                    </div>
+
+                                    <div class="dato">
+                                        <span>Estado</span>
+
+                                        <strong>
+                                            {{ equipo.estado or '-' }}
+                                        </strong>
+                                    </div>
+
+                                    <div class="dato">
+                                        <span>Control de ubicación</span>
+
+                                        <strong>
+                                            {{ equipo.ubicacion or '-' }}
+                                        </strong>
+                                    </div>
+
+                                    <div class="dato">
+                                        <span>Usuario asignado</span>
+
+                                        <strong>
+                                            {{ equipo.usuario_asignado or '-' }}
+                                        </strong>
+                                    </div>
+
+                                    <div class="dato">
+                                        <span>Accesorio</span>
+
+                                        <strong>
+                                            {{ equipo.accesorio or '-' }}
+                                        </strong>
+                                    </div>
+
+                                    <div class="dato">
+                                        <span>Condición de reasignación</span>
+
+                                        <strong>
+                                            {{ equipo.reasignacion or '-' }}
+                                        </strong>
+                                    </div>
+
+                                    <div class="dato">
+                                        <span>Condición del colector</span>
+
+                                        <strong>
+                                            {{ equipo.condicion or '-' }}
+                                        </strong>
+                                    </div>
+
+                                    <div class="dato dato-observacion">
+                                        <span>Observación</span>
+
+                                        <strong>
+                                            {{ equipo.observacion or '-' }}
+                                        </strong>
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="sin-resultados">
+
+                        <div class="icono-sin-resultados">
+                            🔎
+                        </div>
+
+                        <h3>No se encontraron colectores</h3>
+
+                        <p>
+                            Verifica los últimos 6 caracteres de la serie
+                            o el nombre del usuario e intenta nuevamente.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+        {% endif %}
+
+        <section class="tarjeta-formulario">
+
+            <div class="titulo-seccion">
+
+                <div>
+                    <span class="subtitulo-tarjeta">
+                        NUEVO REGISTRO
+                    </span>
+
+                    <h2>Registrar colector</h2>
+
+                    <p>
+                        Completa los datos del colector para guardarlos
+                        en Google Sheets.
+                    </p>
+                </div>
+
+                <span class="estado-conexion">
+                    ● Conectado
+                </span>
+
+            </div>
+
+            <form
+                action="{{ url_for('colector') }}"
+                method="POST"
+                class="formulario"
+            >
+
+                <div class="campo">
+
+                    <label for="item">
+                        <span class="icono-campo">#</span>
+                        Item
+                    </label>
+
+                    <input
+                        type="text"
+                        id="item"
+                        name="item"
+                        placeholder="Ejemplo: 1"
+                        autocomplete="off"
+                        required
+                    >
+
+                </div>
+
+                <div class="campo">
+
+                    <label for="serie">
+                        <span class="icono-campo">⌁</span>
+                        Número de serie
+                    </label>
+
+                    <input
+                        type="text"
+                        id="serie"
+                        name="serie"
+                        placeholder="Ejemplo: HC660BA240301251"
+                        autocomplete="off"
+                        required
+                    >
+
+                </div>
+
+                <div class="campo">
+
+                    <label for="estado">
+                        <span class="icono-campo">📍</span>
+                        Estado
+                    </label>
+
+                    <input
+                        type="text"
+                        id="estado"
+                        name="estado"
+                        list="lista_estado"
+                        placeholder="Escriba o seleccione"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <datalist id="lista_estado">
+                        <option value="LOCALIZADO">
+                        <option value="NO LOCALIZADO">
+                        <option value="EXTRAVIADO">
+                    </datalist>
+
+                </div>
+
+                <div class="campo">
+
+                    <label for="ubicacion">
+                        <span class="icono-campo">🏢</span>
+                        Control de ubicación
+                    </label>
+
+                    <input
+                        type="text"
+                        id="ubicacion"
+                        name="ubicacion"
+                        list="lista_ubicacion"
+                        placeholder="Escriba o seleccione"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <datalist id="lista_ubicacion">
+                        <option value="Nave Central">
+                        <option value="Abastecimiento MKP">
+                        <option value="Soporte">
+                        <option value="FAC">
+                        <option value="Segel">
+                        <option value="Empaque Pickup">
+                    </datalist>
+
+                </div>
+
+                <div class="campo">
+
+                    <label for="usuario_asignado">
+                        <span class="icono-campo">👤</span>
+                        Usuario asignado
+                    </label>
+
+                    <input
+                        type="text"
+                        id="usuario_asignado"
+                        name="usuario_asignado"
+                        placeholder="Ejemplo: JULIO BENITEZ"
+                        autocomplete="off"
+                    >
+
+                </div>
+
+                <div class="campo">
+
+                    <label for="accesorio">
+                        <span class="icono-campo">🔌</span>
+                        Accesorio
+                    </label>
+
+                    <input
+                        type="text"
+                        id="accesorio"
+                        name="accesorio"
+                        list="lista_accesorio"
+                        placeholder="Escriba o seleccione"
+                        autocomplete="off"
+                    >
+
+                    <datalist id="lista_accesorio">
+                        <option value="Con cargador">
+                        <option value="Sin cargador">
+                        <option value="Con base">
+                        <option value="Sin base">
+                        <option value="Completo">
+                    </datalist>
+
+                </div>
+
+                <div class="campo">
+
+                    <label for="reasignacion">
+                        <span class="icono-campo">🔄</span>
+                        Condición de reasignación
+                    </label>
+
+                    <input
+                        type="text"
+                        id="reasignacion"
+                        name="reasignacion"
+                        list="lista_reasignacion"
+                        placeholder="Escriba o seleccione"
+                        autocomplete="off"
+                    >
+
+                    <datalist id="lista_reasignacion">
+                        <option value="Con Usuario">
+                        <option value="Reasignar">
+                        <option value="Con el Proveedor">
+                    </datalist>
+
+                </div>
+
+                <div class="campo">
+
+                    <label for="condicion">
+                        <span class="icono-campo">🛠️</span>
+                        Condición del colector
+                    </label>
+
+                    <input
+                        type="text"
+                        id="condicion"
+                        name="condicion"
+                        list="lista_condicion"
+                        placeholder="Escriba o seleccione"
+                        autocomplete="off"
+                    >
+
+                    <datalist id="lista_condicion">
+                        <option value="Operativo">
+                        <option value="En Buenas Condiciones">
+                        <option value="Defectuoso de Soporte">
+                        <option value="En reparación con el Proveedor">
+                    </datalist>
+
+                </div>
+
+                <div class="campo campo-completo">
+
+                    <label for="observacion">
+                        <span class="icono-campo">✎</span>
+                        Observación
+                    </label>
+
+                    <textarea
+                        id="observacion"
+                        name="observacion"
+                        rows="5"
+                        placeholder="Escribe aquí cualquier información adicional sobre el colector..."
+                    ></textarea>
+
+                </div>
+
+                <div class="acciones campo-completo">
+
+                    <button
+                        type="reset"
+                        class="boton-secundario"
+                    >
+                        Limpiar campos
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="boton-principal"
+                    >
+                        <span>💾</span>
+                        Guardar colector
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <footer>
+            Sistema de inventario de colectores
+        </footer>
+
+    </main>
+
+</body>
+
+</html>

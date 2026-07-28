@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Iniciar sesión | Sistema de Colectores</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='estilos.css') }}"
+    >
+</head>
+
+<body class="pagina-login">
+
+    <div class="login-fondo login-fondo-uno"></div>
+    <div class="login-fondo login-fondo-dos"></div>
+
+    <main class="contenedor-login">
+
+        <section class="tarjeta-login">
+
+            <div class="encabezado-login">
+
+                <div class="icono-login">
+                    📦
+                </div>
+
+                <span class="etiqueta-login">
+                    ACCESO AL SISTEMA
+                </span>
+
+                <h1>Sistema de Colectores</h1>
+
+                <p class="descripcion-login">
+                    Ingresa tu usuario y contraseña para acceder al
+                    inventario de colectores.
+                </p>
+
+            </div>
+
+            {% with mensajes = get_flashed_messages(with_categories=true) %}
+
+                {% if mensajes %}
+
+                    <div class="mensajes mensajes-login">
+
+                        {% for categoria, mensaje in mensajes %}
+
+                            <div class="mensaje {{ categoria }}">
+                                {{ mensaje }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+
+            {% endwith %}
+
+            <form
+                action="{{ url_for('login') }}"
+                method="POST"
+                class="formulario-login"
+            >
+
+                <div class="campo-login">
+
+                    <label for="usuario">
+                        Usuario
+                    </label>
+
+                    <div class="control-login">
+
+                        <span class="icono-control">
+                            👤
+                        </span>
+
+                        <input
+                            type="text"
+                            id="usuario"
+                            name="usuario"
+                            placeholder="Ingresa tu usuario"
+                            autocomplete="username"
+                            required
+                            autofocus
+                        >
+
+                    </div>
+
+                </div>
+
+                <div class="campo-login">
+
+                    <label for="contrasena">
+                        Contraseña
+                    </label>
+
+                    <div class="control-login">
+
+                        <span class="icono-control">
+                            🔒
+                        </span>
+
+                        <input
+                            type="password"
+                            id="contrasena"
+                            name="contrasena"
+                            placeholder="Ingresa tu contraseña"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="boton-ver-contrasena"
+                            id="botonVerContrasena"
+                            aria-label="Mostrar contraseña"
+                        >
+                            👁️
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="boton-ingresar"
+                >
+                    <span>🔐</span>
+                    Ingresar al sistema
+                </button>
+
+            </form>
+
+            <div class="seguridad-login">
+
+                <span>🛡️</span>
+
+                <p>
+                    Acceso exclusivo para personal autorizado.
+                </p>
+
+            </div>
+
+            <footer class="pie-login">
+                Sistema de inventario de colectores
+            </footer>
+
+        </section>
+
+    </main>
+
+    <script>
+        const botonVerContrasena = document.getElementById(
+            "botonVerContrasena"
+        );
+
+        const campoContrasena = document.getElementById(
+            "contrasena"
+        );
+
+        botonVerContrasena.addEventListener("click", function () {
+
+            const estaOculta =
+                campoContrasena.type === "password";
+
+            campoContrasena.type =
+                estaOculta ? "text" : "password";
+
+            botonVerContrasena.textContent =
+                estaOculta ? "🙈" : "👁️";
+
+            botonVerContrasena.setAttribute(
+                "aria-label",
+                estaOculta
+                    ? "Ocultar contraseña"
+                    : "Mostrar contraseña"
+            );
+        });
+    </script>
+
+</body>
+
+</html>
