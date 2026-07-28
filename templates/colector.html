@@ -15,6 +15,131 @@
         rel="stylesheet"
         href="{{ url_for('static', filename='estilos.css') }}"
     >
+
+    <style>
+        .panel-resumen {
+            margin-bottom: 22px;
+            padding: 24px;
+            border-radius: 22px;
+            background: #ffffff;
+            box-shadow: 0 14px 35px rgba(15, 23, 42, 0.10);
+        }
+
+        .resumen-cabecera {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .resumen-cabecera h2 {
+            margin: 5px 0 4px;
+        }
+
+        .tarjetas-resumen {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .tarjeta-contador {
+            padding: 16px;
+            border: 1px solid #dbe5f2;
+            border-radius: 16px;
+            background: #f8fbff;
+        }
+
+        .tarjeta-contador strong {
+            display: block;
+            margin-top: 5px;
+            font-size: 25px;
+            color: #14213d;
+        }
+
+        .tarjeta-contador span {
+            color: #66758d;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .formulario-filtros {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 13px;
+            align-items: end;
+        }
+
+        .campo-filtro label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 13px;
+            font-weight: 800;
+            color: #26364d;
+        }
+
+        .campo-filtro select {
+            width: 100%;
+            min-height: 45px;
+            padding: 0 12px;
+            border: 1px solid #cbd8e8;
+            border-radius: 11px;
+            background: #f8fafc;
+            color: #172033;
+        }
+
+        .acciones-filtros {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .boton-aplicar-filtro,
+        .boton-quitar-filtro {
+            min-height: 43px;
+            padding: 0 18px;
+            border: 0;
+            border-radius: 11px;
+            font-weight: 800;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .boton-aplicar-filtro {
+            background: #2457dc;
+            color: #fff;
+        }
+
+        .boton-quitar-filtro {
+            background: #e8edf5;
+            color: #26364d;
+        }
+
+        @media (max-width: 900px) {
+            .tarjetas-resumen,
+            .formulario-filtros {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            .tarjetas-resumen,
+            .formulario-filtros {
+                grid-template-columns: 1fr;
+            }
+
+            .acciones-filtros {
+                flex-direction: column;
+            }
+        }
+    </style>
+
 </head>
 
 <body>
@@ -71,6 +196,170 @@
 
         {% endwith %}
 
+        <section class="panel-resumen">
+
+            <div class="resumen-cabecera">
+                <div>
+                    <span class="subtitulo-tarjeta">
+                        RESUMEN DEL INVENTARIO
+                    </span>
+
+                    <h2>Totales y filtros</h2>
+
+                    <p>
+                        Los números se calculan directamente desde la hoja COLECTOR.
+                    </p>
+                </div>
+            </div>
+
+            <div class="tarjetas-resumen">
+
+                <div class="tarjeta-contador">
+                    <span>Total de colectores</span>
+                    <strong>{{ resumen.total }}</strong>
+                </div>
+
+                <div class="tarjeta-contador">
+                    <span>Localizados</span>
+                    <strong>{{ resumen.localizados }}</strong>
+                </div>
+
+                <div class="tarjeta-contador">
+                    <span>No localizados</span>
+                    <strong>{{ resumen.no_localizados }}</strong>
+                </div>
+
+                <div class="tarjeta-contador">
+                    <span>Extraviados</span>
+                    <strong>{{ resumen.extraviados }}</strong>
+                </div>
+
+                <div class="tarjeta-contador">
+                    <span>Con usuario</span>
+                    <strong>{{ resumen.con_usuario }}</strong>
+                </div>
+
+                <div class="tarjeta-contador">
+                    <span>Para reasignar</span>
+                    <strong>{{ resumen.reasignar }}</strong>
+                </div>
+
+                <div class="tarjeta-contador">
+                    <span>Operativos</span>
+                    <strong>{{ resumen.operativos }}</strong>
+                </div>
+
+                <div class="tarjeta-contador">
+                    <span>Reparación o defectuosos</span>
+                    <strong>{{ resumen.reparacion_defectuosos }}</strong>
+                </div>
+
+            </div>
+
+            <form
+                action="{{ url_for('buscar_colector') }}"
+                method="GET"
+                class="formulario-filtros"
+            >
+
+                <input
+                    type="hidden"
+                    name="consulta"
+                    value="{{ consulta or '' }}"
+                >
+
+                <div class="campo-filtro">
+                    <label for="filtro_estado">Estado</label>
+
+                    <select id="filtro_estado" name="estado">
+                        <option value="">Todos los estados</option>
+
+                        {% for valor in opciones.estados %}
+                            <option
+                                value="{{ valor }}"
+                                {% if filtros.estado == valor %}selected{% endif %}
+                            >
+                                {{ valor }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="campo-filtro">
+                    <label for="filtro_ubicacion">Control de ubicación</label>
+
+                    <select id="filtro_ubicacion" name="ubicacion">
+                        <option value="">Todas las ubicaciones</option>
+
+                        {% for valor in opciones.ubicaciones %}
+                            <option
+                                value="{{ valor }}"
+                                {% if filtros.ubicacion == valor %}selected{% endif %}
+                            >
+                                {{ valor }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="campo-filtro">
+                    <label for="filtro_reasignacion">
+                        Condición de reasignación
+                    </label>
+
+                    <select id="filtro_reasignacion" name="reasignacion">
+                        <option value="">Todas las condiciones</option>
+
+                        {% for valor in opciones.reasignaciones %}
+                            <option
+                                value="{{ valor }}"
+                                {% if filtros.reasignacion == valor %}selected{% endif %}
+                            >
+                                {{ valor }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="campo-filtro">
+                    <label for="filtro_condicion">
+                        Condición del colector
+                    </label>
+
+                    <select id="filtro_condicion" name="condicion">
+                        <option value="">Todas las condiciones</option>
+
+                        {% for valor in opciones.condiciones %}
+                            <option
+                                value="{{ valor }}"
+                                {% if filtros.condicion == valor %}selected{% endif %}
+                            >
+                                {{ valor }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="acciones-filtros">
+                    <a
+                        href="{{ url_for('inicio') }}"
+                        class="boton-quitar-filtro"
+                    >
+                        Quitar filtros
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="boton-aplicar-filtro"
+                    >
+                        🔎 Aplicar filtros
+                    </button>
+                </div>
+
+            </form>
+
+        </section>
+
         <section class="tarjeta-buscador">
 
             <div class="titulo-buscador">
@@ -113,10 +402,14 @@
                         value="{{ consulta or '' }}"
                         placeholder="Ejemplo: 301251 o JULIO BENITEZ"
                         autocomplete="off"
-                        required
                     >
 
                 </div>
+
+                <input type="hidden" name="estado" value="{{ filtros.estado }}">
+                <input type="hidden" name="ubicacion" value="{{ filtros.ubicacion }}">
+                <input type="hidden" name="reasignacion" value="{{ filtros.reasignacion }}">
+                <input type="hidden" name="condicion" value="{{ filtros.condicion }}">
 
                 <button
                     type="submit"
@@ -126,7 +419,7 @@
                     Buscar colector
                 </button>
 
-                {% if consulta %}
+                {% if consulta or filtros.estado or filtros.ubicacion or filtros.reasignacion or filtros.condicion %}
 
                     <a
                         href="{{ url_for('inicio') }}"
@@ -141,7 +434,7 @@
 
         </section>
 
-        {% if consulta %}
+        {% if consulta or filtros.estado or filtros.ubicacion or filtros.reasignacion or filtros.condicion %}
 
             <section class="seccion-resultados">
 
@@ -155,8 +448,12 @@
                         <h2>Colectores encontrados</h2>
 
                         <p>
-                            Búsqueda realizada por:
-                            <strong>{{ consulta }}</strong>
+                            {% if consulta %}
+                                Búsqueda realizada por:
+                                <strong>{{ consulta }}</strong>
+                            {% else %}
+                                Resultados según los filtros seleccionados.
+                            {% endif %}
                         </p>
                     </div>
 
