@@ -45,7 +45,7 @@ USUARIO_ADMIN = os.environ.get(
 
 CONTRASENA_ADMIN = os.environ.get(
     "ADMIN_PASSWORD",
-    "123456"
+    "di6v6l6"
 )
 
 
