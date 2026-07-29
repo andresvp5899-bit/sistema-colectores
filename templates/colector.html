@@ -138,275 +138,6 @@
                 flex-direction: column;
             }
         }
-
-        /* ===== REDISEÑO MODERNO ===== */
-        :root {
-            --azul: #2563eb;
-            --azul-oscuro: #172554;
-            --texto: #14213d;
-            --muted: #64748b;
-            --borde: #dbe5f2;
-        }
-
-        body {
-            background:
-                radial-gradient(circle at top left, rgba(37,99,235,.12), transparent 34%),
-                radial-gradient(circle at bottom right, rgba(14,165,233,.10), transparent 30%),
-                linear-gradient(180deg, #edf3fb 0%, #f8fbff 100%);
-        }
-
-        .pagina {
-            max-width: 1480px;
-            margin: 0 auto;
-            padding: 26px;
-        }
-
-        .encabezado {
-            position: relative;
-            overflow: hidden;
-            min-height: 145px;
-            padding: 30px 34px;
-            border-radius: 28px;
-            background: linear-gradient(120deg, #0f172a, #1e40af 56%, #2563eb);
-            box-shadow: 0 22px 50px rgba(30,64,175,.22);
-        }
-
-        .encabezado::after {
-            content: "";
-            position: absolute;
-            width: 260px;
-            height: 260px;
-            right: -80px;
-            top: -110px;
-            border-radius: 50%;
-            background: rgba(255,255,255,.08);
-        }
-
-        .icono-principal {
-            position: relative;
-            z-index: 1;
-            width: 82px;
-            height: 82px;
-            display: grid;
-            place-items: center;
-            border-radius: 22px;
-            font-size: 38px;
-            background: rgba(255,255,255,.11);
-            border: 1px solid rgba(255,255,255,.22);
-        }
-
-        .encabezado-texto,
-        .boton-cerrar-sesion {
-            position: relative;
-            z-index: 1;
-        }
-
-        .encabezado h1 {
-            margin: 4px 0 6px;
-            font-size: clamp(2rem, 4vw, 3rem);
-            letter-spacing: -.035em;
-        }
-
-        .boton-cerrar-sesion {
-            padding: 13px 20px;
-            border-radius: 13px;
-            background: rgba(255,255,255,.13);
-            border: 1px solid rgba(255,255,255,.26);
-            transition: .2s ease;
-        }
-
-        .boton-cerrar-sesion:hover {
-            transform: translateY(-2px);
-            background: rgba(255,255,255,.20);
-        }
-
-        .panel-resumen,
-        .tarjeta-buscador,
-        .tarjeta-formulario,
-        .seccion-resultados {
-            border: 1px solid rgba(203,216,232,.82);
-            border-radius: 26px;
-            background: rgba(255,255,255,.97);
-            box-shadow: 0 18px 42px rgba(15,23,42,.08);
-        }
-
-        .panel-resumen,
-        .tarjeta-buscador,
-        .tarjeta-formulario,
-        .seccion-resultados {
-            padding: 30px;
-        }
-
-        .tarjetas-resumen {
-            gap: 16px;
-        }
-
-        .tarjeta-contador {
-            position: relative;
-            overflow: hidden;
-            min-height: 128px;
-            padding: 20px;
-            border-radius: 20px;
-            background: #fff;
-            border: 1px solid var(--borde);
-            box-shadow: 0 10px 24px rgba(15,23,42,.05);
-            transition: .22s ease;
-        }
-
-        .tarjeta-contador::before {
-            content: "";
-            position: absolute;
-            inset: 0 auto 0 0;
-            width: 5px;
-            background: var(--azul);
-        }
-
-        .tarjeta-contador::after {
-            position: absolute;
-            right: 17px;
-            top: 14px;
-            width: 38px;
-            height: 38px;
-            display: grid;
-            place-items: center;
-            border-radius: 12px;
-            font-size: 20px;
-            background: rgba(37,99,235,.10);
-        }
-
-        .tarjeta-contador:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 18px 34px rgba(15,23,42,.10);
-        }
-
-        .tarjeta-contador span {
-            max-width: calc(100% - 52px);
-            color: var(--muted);
-            font-size: 13px;
-            line-height: 1.35;
-        }
-
-        .tarjeta-contador strong {
-            margin-top: 13px;
-            font-size: 32px;
-            line-height: 1;
-            color: var(--texto);
-        }
-
-        .tarjeta-contador:nth-child(1)::before { background:#2563eb; }
-        .tarjeta-contador:nth-child(1)::after { content:"📦"; }
-        .tarjeta-contador:nth-child(2)::before { background:#16a34a; }
-        .tarjeta-contador:nth-child(2)::after { content:"✅"; background:rgba(22,163,74,.11); }
-        .tarjeta-contador:nth-child(3)::before { background:#ea580c; }
-        .tarjeta-contador:nth-child(3)::after { content:"⚠️"; background:rgba(234,88,12,.11); }
-        .tarjeta-contador:nth-child(4)::before { background:#dc2626; }
-        .tarjeta-contador:nth-child(4)::after { content:"❌"; background:rgba(220,38,38,.10); }
-        .tarjeta-contador:nth-child(5)::before { background:#7c3aed; }
-        .tarjeta-contador:nth-child(5)::after { content:"👤"; background:rgba(124,58,237,.10); }
-        .tarjeta-contador:nth-child(6)::before { background:#ca8a04; }
-        .tarjeta-contador:nth-child(6)::after { content:"🔄"; background:rgba(202,138,4,.12); }
-        .tarjeta-contador:nth-child(7)::before { background:#16a34a; }
-        .tarjeta-contador:nth-child(7)::after { content:"🟢"; background:rgba(22,163,74,.10); }
-        .tarjeta-contador:nth-child(8)::before { background:#dc2626; }
-        .tarjeta-contador:nth-child(8)::after { content:"🛠️"; background:rgba(220,38,38,.09); }
-
-        .formulario-filtros {
-            margin-top: 8px;
-            padding: 20px;
-            border-radius: 19px;
-            background: linear-gradient(180deg,#f8fbff,#f3f7fc);
-            border: 1px solid #dce7f3;
-        }
-
-        .campo-filtro select,
-        .campo input,
-        .campo textarea,
-        .campo select,
-        .campo-busqueda input {
-            border: 1px solid #cedaea;
-            background: #f9fbfe;
-            transition: .2s ease;
-        }
-
-        .campo-filtro select:focus,
-        .campo input:focus,
-        .campo textarea:focus,
-        .campo select:focus,
-        .campo-busqueda input:focus {
-            border-color: var(--azul);
-            background: #fff;
-            box-shadow: 0 0 0 4px rgba(37,99,235,.10);
-            outline: none;
-        }
-
-        .boton-aplicar-filtro,
-        .boton-buscar {
-            background: linear-gradient(135deg,#1d4ed8,#2563eb);
-            box-shadow: 0 10px 22px rgba(37,99,235,.22);
-        }
-
-        .boton-principal {
-            background: linear-gradient(135deg,#16a34a,#22c55e);
-            box-shadow: 0 10px 22px rgba(34,197,94,.22);
-        }
-
-        .boton-aplicar-filtro,
-        .boton-buscar,
-        .boton-principal {
-            transition: .2s ease;
-        }
-
-        .boton-aplicar-filtro:hover,
-        .boton-buscar:hover,
-        .boton-principal:hover {
-            transform: translateY(-2px);
-        }
-
-        .boton-quitar-filtro,
-        .boton-secundario,
-        .boton-limpiar-busqueda {
-            border: 1px solid #d8e1ec;
-            background: #eef3f8;
-            color: #334155;
-        }
-
-        .icono-busqueda {
-            width: 54px;
-            height: 54px;
-            display: grid;
-            place-items: center;
-            border-radius: 16px;
-            background: rgba(37,99,235,.10);
-            border: 1px solid rgba(37,99,235,.12);
-            font-size: 25px;
-        }
-
-        .estado-conexion {
-            padding: 10px 14px;
-            border-radius: 999px;
-            background: #dcfce7;
-            border: 1px solid #bbf7d0;
-            color: #166534;
-            font-weight: 800;
-        }
-
-        .tarjeta-resultado {
-            border-radius: 22px;
-            border: 1px solid #dbe5f2;
-            background: linear-gradient(180deg,#fff,#fbfdff);
-            box-shadow: 0 14px 30px rgba(15,23,42,.07);
-        }
-
-        @media (max-width: 600px) {
-            .pagina { padding: 12px; }
-            .encabezado { padding: 22px; border-radius: 22px; }
-            .panel-resumen,
-            .tarjeta-buscador,
-            .tarjeta-formulario,
-            .seccion-resultados { padding: 20px; border-radius: 20px; }
-            .boton-cerrar-sesion { width: 100%; margin-top: 12px; }
-        }
-
     </style>
 
 </head>
@@ -525,107 +256,7 @@
 
             </div>
 
-            <form
-                action="{{ url_for('buscar_colector') }}"
-                method="GET"
-                class="formulario-filtros"
-            >
-
-                <input
-                    type="hidden"
-                    name="consulta"
-                    value="{{ consulta or '' }}"
-                >
-
-                <div class="campo-filtro">
-                    <label for="filtro_estado">Estado</label>
-
-                    <select id="filtro_estado" name="estado">
-                        <option value="">Todos los estados</option>
-
-                        {% for valor in opciones.estados %}
-                            <option
-                                value="{{ valor }}"
-                                {% if filtros.estado == valor %}selected{% endif %}
-                            >
-                                {{ valor }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="campo-filtro">
-                    <label for="filtro_ubicacion">Control de ubicación</label>
-
-                    <select id="filtro_ubicacion" name="ubicacion">
-                        <option value="">Todas las ubicaciones</option>
-
-                        {% for valor in opciones.ubicaciones %}
-                            <option
-                                value="{{ valor }}"
-                                {% if filtros.ubicacion == valor %}selected{% endif %}
-                            >
-                                {{ valor }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="campo-filtro">
-                    <label for="filtro_reasignacion">
-                        Condición de reasignación
-                    </label>
-
-                    <select id="filtro_reasignacion" name="reasignacion">
-                        <option value="">Todas las condiciones</option>
-
-                        {% for valor in opciones.reasignaciones %}
-                            <option
-                                value="{{ valor }}"
-                                {% if filtros.reasignacion == valor %}selected{% endif %}
-                            >
-                                {{ valor }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="campo-filtro">
-                    <label for="filtro_condicion">
-                        Condición del colector
-                    </label>
-
-                    <select id="filtro_condicion" name="condicion">
-                        <option value="">Todas las condiciones</option>
-
-                        {% for valor in opciones.condiciones %}
-                            <option
-                                value="{{ valor }}"
-                                {% if filtros.condicion == valor %}selected{% endif %}
-                            >
-                                {{ valor }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="acciones-filtros">
-                    <a
-                        href="{{ url_for('inicio') }}"
-                        class="boton-quitar-filtro"
-                    >
-                        Quitar filtros
-                    </a>
-
-                    <button
-                        type="submit"
-                        class="boton-aplicar-filtro"
-                    >
-                        🔎 Aplicar filtros
-                    </button>
-                </div>
-
-            </form>
+            
 
         </section>
 
@@ -674,13 +305,7 @@
                     >
 
                 </div>
-
-                <input type="hidden" name="estado" value="{{ filtros.estado }}">
-                <input type="hidden" name="ubicacion" value="{{ filtros.ubicacion }}">
-                <input type="hidden" name="reasignacion" value="{{ filtros.reasignacion }}">
-                <input type="hidden" name="condicion" value="{{ filtros.condicion }}">
-
-                <button
+<button
                     type="submit"
                     class="boton-buscar"
                 >
@@ -688,7 +313,7 @@
                     Buscar colector
                 </button>
 
-                {% if consulta or filtros.estado or filtros.ubicacion or filtros.reasignacion or filtros.condicion %}
+                {% if consulta %}
 
                     <a
                         href="{{ url_for('inicio') }}"
@@ -703,7 +328,7 @@
 
         </section>
 
-        {% if consulta or filtros.estado or filtros.ubicacion or filtros.reasignacion or filtros.condicion %}
+        {% if consulta %}
 
             <section class="seccion-resultados">
 
@@ -717,12 +342,8 @@
                         <h2>Colectores encontrados</h2>
 
                         <p>
-                            {% if consulta %}
-                                Búsqueda realizada por:
-                                <strong>{{ consulta }}</strong>
-                            {% else %}
-                                Resultados según los filtros seleccionados.
-                            {% endif %}
+                            Búsqueda realizada por:
+                            <strong>{{ consulta }}</strong>
                         </p>
                     </div>
 
@@ -1068,12 +689,12 @@
                         id="estado"
                         name="estado"
                         list="lista_estado"
-                        placeholder="Escriba o seleccione"
+                        placeholder="Escriba o seleccione una opción"
                         autocomplete="off"
                         required
                     >
 
-                    <datalist id="lista_estado">
+                                        <datalist id="lista_estado">
                         <option value="LOCALIZADO">
                         <option value="NO LOCALIZADO">
                         <option value="EXTRAVIADO">
@@ -1093,18 +714,38 @@
                         id="ubicacion"
                         name="ubicacion"
                         list="lista_ubicacion"
-                        placeholder="Escriba o seleccione"
+                        placeholder="Escriba o seleccione una opción"
                         autocomplete="off"
                         required
                     >
 
-                    <datalist id="lista_ubicacion">
-                        <option value="Nave Central">
-                        <option value="Abastecimiento MKP">
+                                        <datalist id="lista_ubicacion">
+                        <option value="Nave central">
                         <option value="Soporte">
-                        <option value="FAC">
+                        <option value="Empaque pickup">
+                        <option value="CD2">
+                        <option value="Empaque tupi">
+                        <option value="Transportadora">
+                        <option value="Autos">
+                        <option value="Deposito MKP">
+                        <option value="Toke">
+                        <option value="Auditoria de stock">
+                        <option value="Deposito 669">
+                        <option value="Proveedor">
+                        <option value="Schulz">
+                        <option value="CDE">
+                        <option value="CDI">
+                        <option value="CD3">
+                        <option value="Salon Tupi PB">
                         <option value="Segel">
-                        <option value="Empaque Pickup">
+                        <option value="Abastecimiento MKP">
+                        <option value="Saldo">
+                        <option value="EMPAQUE PB MKP">
+                        <option value="TRASTIENDA PB">
+                        <option value="TRASTIENDA PISO 1">
+                        <option value="PICKING MKP">
+                        <option value="FAC">
+                        <option value="Shopping">
                     </datalist>
 
                 </div>
@@ -1138,11 +779,11 @@
                         id="accesorio"
                         name="accesorio"
                         list="lista_accesorio"
-                        placeholder="Escriba o seleccione"
+                        placeholder="Escriba o seleccione una opción"
                         autocomplete="off"
                     >
 
-                    <datalist id="lista_accesorio">
+                                        <datalist id="lista_accesorio">
                         <option value="Con cargador">
                         <option value="Sin cargador">
                         <option value="Con base">
@@ -1164,13 +805,16 @@
                         id="reasignacion"
                         name="reasignacion"
                         list="lista_reasignacion"
-                        placeholder="Escriba o seleccione"
+                        placeholder="Escriba o seleccione una opción"
                         autocomplete="off"
                     >
 
-                    <datalist id="lista_reasignacion">
-                        <option value="Con Usuario">
+                                        <datalist id="lista_reasignacion">
                         <option value="Reasignar">
+                        <option value="No Reasignar">
+                        <option value="Verificar si Funciona en Soporte">
+                        <option value="Para Reparacion">
+                        <option value="Con Usuario">
                         <option value="Con el Proveedor">
                     </datalist>
 
@@ -1188,15 +832,21 @@
                         id="condicion"
                         name="condicion"
                         list="lista_condicion"
-                        placeholder="Escriba o seleccione"
+                        placeholder="Escriba o seleccione una opción"
                         autocomplete="off"
                     >
 
-                    <datalist id="lista_condicion">
+                                        <datalist id="lista_condicion">
                         <option value="Operativo">
-                        <option value="En Buenas Condiciones">
                         <option value="Defectuoso de Soporte">
-                        <option value="En reparación con el Proveedor">
+                        <option value="En Buenas condiciones">
+                        <option value="En reparacion con el Proveedor">
+                        <option value="Fuera de Servicio">
+                        <option value="Para llevar a Reparar">
+                        <option value="Antes de Asignar ver si funciona en Soporte">
+                        <option value="En reparacion">
+                        <option value="Boton de Lector Sensible">
+                        <option value="Defectuoso de Departamentos">
                     </datalist>
 
                 </div>
