@@ -368,25 +368,45 @@
     </div>
 
     <script>
-        const buscador = document.getElementById("buscarTabla");
-        const tabla = document.getElementById("tablaColectores");
-        const contador = document.getElementById("contadorFilas");
+       const buscador = document.getElementById("buscarTabla");
+const tabla = document.getElementById("tablaColectores");
+const contador = document.getElementById("contadorFilas");
 
-        buscador.addEventListener("input", function () {
-            const texto = this.value.trim().toLowerCase();
-            const filas = tabla.querySelectorAll("tbody tr");
-            let visibles = 0;
+buscador.addEventListener("input", function () {
 
-            filas.forEach(fila => {
-                if (fila.querySelector(".sin-registros")) return;
+    const textoBuscado = this.value
+        .trim()
+        .toLowerCase();
 
-                const coincide = fila.innerText.toLowerCase().includes(texto);
-                fila.style.display = coincide ? "" : "none";
-                if (coincide) visibles++;
-            });
+    const filas = tabla.querySelectorAll("tbody tr");
 
-            contador.textContent = `Mostrando ${visibles} registro${visibles === 1 ? "" : "s"}`;
-        });
+    let visibles = 0;
+
+    filas.forEach(function (fila) {
+
+        if (fila.querySelector(".sin-registros")) {
+            return;
+        }
+
+        // Busca en TODAS las columnas
+        const contenido = fila.textContent
+            .toLowerCase();
+
+        if (contenido.indexOf(textoBuscado) !== -1) {
+            fila.style.display = "";
+            visibles++;
+        } else {
+            fila.style.display = "none";
+        }
+
+    });
+
+    contador.textContent =
+        "Mostrando " +
+        visibles +
+        (visibles === 1 ? " registro" : " registros");
+
+});
 
         const modal = document.getElementById("modalEdicion");
         const cerrarModal = document.getElementById("cerrarModal");
