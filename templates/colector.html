@@ -1,901 +1,455 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>sistema de Colector</title>
-
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='estilos.css') }}"
-    >
-
-    <style>
-        .panel-resumen {
-            margin-bottom: 22px;
-            padding: 24px;
-            border-radius: 22px;
-            background: #ffffff;
-            box-shadow: 0 14px 35px rgba(15, 23, 42, 0.10);
-        }
-
-        .resumen-cabecera {
-            display: flex;
-            justify-content: space-between;
-            gap: 18px;
-            align-items: flex-start;
-            margin-bottom: 20px;
-        }
-
-        .resumen-cabecera h2 {
-            margin: 5px 0 4px;
-        }
-
-        .tarjetas-resumen {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 12px;
-            margin-bottom: 22px;
-        }
-
-        .tarjeta-contador {
-            padding: 16px;
-            border: 1px solid #dbe5f2;
-            border-radius: 16px;
-            background: #f8fbff;
-        }
-
-        .tarjeta-contador strong {
-            display: block;
-            margin-top: 5px;
-            font-size: 25px;
-            color: #14213d;
-        }
-
-        .tarjeta-contador span {
-            color: #66758d;
-            font-size: 13px;
-            font-weight: 700;
-        }
-
-        .formulario-filtros {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 13px;
-            align-items: end;
-        }
-
-        .campo-filtro label {
-            display: block;
-            margin-bottom: 7px;
-            font-size: 13px;
-            font-weight: 800;
-            color: #26364d;
-        }
-
-        .campo-filtro select {
-            width: 100%;
-            min-height: 45px;
-            padding: 0 12px;
-            border: 1px solid #cbd8e8;
-            border-radius: 11px;
-            background: #f8fafc;
-            color: #172033;
-        }
-
-        .acciones-filtros {
-            grid-column: 1 / -1;
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 4px;
-        }
-
-        .boton-aplicar-filtro,
-        .boton-quitar-filtro {
-            min-height: 43px;
-            padding: 0 18px;
-            border: 0;
-            border-radius: 11px;
-            font-weight: 800;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        .boton-aplicar-filtro {
-            background: #2457dc;
-            color: #fff;
-        }
-
-        .boton-quitar-filtro {
-            background: #e8edf5;
-            color: #26364d;
-        }
-
-        @media (max-width: 900px) {
-            .tarjetas-resumen,
-            .formulario-filtros {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
-
-        @media (max-width: 600px) {
-            .tarjetas-resumen,
-            .formulario-filtros {
-                grid-template-columns: 1fr;
-            }
-
-            .acciones-filtros {
-                flex-direction: column;
-            }
-        }
-    </style>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario de Colectores</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
 </head>
 
-<body>
-
-    <div class="fondo-decorativo fondo-uno"></div>
-    <div class="fondo-decorativo fondo-dos"></div>
-
-    <main class="pagina">
-
-        <section class="encabezado">
-
-            <div class="icono-principal">
-                📦
+<body class="pagina-sistema">
+    <header class="hero">
+        <div class="hero-contenido">
+            <div>
+                <span class="hero-etiqueta">INVENTARIO DE ACTIVOS</span>
+                <h1>Inventario de Colectores</h1>
+                <p>Registro, control de ubicación, búsqueda y administración de colectores.</p>
             </div>
 
-            <div class="encabezado-texto">
-                <span class="etiqueta-superior">
-                    INVENTARIO DE ACTIVOS
-                </span>
+            <a href="{{ url_for('logout') }}" class="btn-cerrar">Cerrar sesión</a>
+        </div>
+    </header>
 
-                <h1>Sistema de Colector</h1>
-
-                <p>
-                    Registro, búsqueda y administración de colectores
-                </p>
-            </div>
-
-            <a
-                href="{{ url_for('logout') }}"
-                class="boton-cerrar-sesion"
-            >
-                Cerrar sesión
-            </a>
-
-        </section>
+    <main class="contenedor-principal">
 
         {% with mensajes = get_flashed_messages(with_categories=true) %}
-
             {% if mensajes %}
-
-                <section class="mensajes">
-
+                <div class="mensajes">
                     {% for categoria, mensaje in mensajes %}
-
-                        <div class="mensaje {{ categoria }}">
-                            {{ mensaje }}
-                        </div>
-
+                        <div class="mensaje {{ categoria }}">{{ mensaje }}</div>
                     {% endfor %}
-
-                </section>
-
+                </div>
             {% endif %}
-
         {% endwith %}
 
-        <section class="panel-resumen">
+        <!-- TARJETAS PRINCIPALES -->
+        <section class="grid-estadisticas">
+            <article class="stat stat-azul">
+                <span>TOTAL DE COLECTORES</span>
+                <strong>{{ resumen.total }}</strong>
+            </article>
 
-            <div class="resumen-cabecera">
-                <div>
-                    <span class="subtitulo-tarjeta">
-                        RESUMEN DEL INVENTARIO
-                    </span>
+            <article class="stat stat-verde">
+                <span>LOCALIZADOS</span>
+                <strong>{{ resumen.localizados }}</strong>
+            </article>
 
-                    <h2>Totales y filtros</h2>
+            <article class="stat stat-amarillo">
+                <span>NO LOCALIZADOS</span>
+                <strong>{{ resumen.no_localizados }}</strong>
+            </article>
 
-                    <p>
-                        Los números se calculan directamente desde la hoja COLECTOR.
-                    </p>
-                </div>
-            </div>
-
-            <div class="tarjetas-resumen">
-
-                <div class="tarjeta-contador">
-                    <span>Total de colectores</span>
-                    <strong>{{ resumen.total }}</strong>
-                </div>
-
-                <div class="tarjeta-contador">
-                    <span>Localizados</span>
-                    <strong>{{ resumen.localizados }}</strong>
-                </div>
-
-                <div class="tarjeta-contador">
-                    <span>No localizados</span>
-                    <strong>{{ resumen.no_localizados }}</strong>
-                </div>
-
-                <div class="tarjeta-contador">
-                    <span>Extraviados</span>
-                    <strong>{{ resumen.extraviados }}</strong>
-                </div>
-
-                <div class="tarjeta-contador">
-                    <span>Con usuario</span>
-                    <strong>{{ resumen.con_usuario }}</strong>
-                </div>
-
-                <div class="tarjeta-contador">
-                    <span>Para reasignar</span>
-                    <strong>{{ resumen.reasignar }}</strong>
-                </div>
-
-                <div class="tarjeta-contador">
-                    <span>Operativos</span>
-                    <strong>{{ resumen.operativos }}</strong>
-                </div>
-
-                <div class="tarjeta-contador">
-                    <span>Reparación o defectuosos</span>
-                    <strong>{{ resumen.reparacion_defectuosos }}</strong>
-                </div>
-
-            </div>
-
-            
-
+            <article class="stat stat-rojo">
+                <span>EXTRAVIADOS</span>
+                <strong>{{ resumen.extraviados }}</strong>
+            </article>
         </section>
 
-        <section class="tarjeta-buscador">
-
-            <div class="titulo-buscador">
-
+        <!-- COLECTORES POR UBICACIÓN -->
+        <section class="panel">
+            <div class="cabecera-panel">
                 <div>
-                    <span class="subtitulo-tarjeta">
-                        CONSULTA DE COLECTORES
-                    </span>
-
-                    <h2>Buscar colector</h2>
-
-                    <p>
-                        Ingresa 6 o más caracteres del número de serie,
-                        la serie completa o el nombre del usuario asignado.
-                    </p>
+                    <h2>Colectores por ubicación</h2>
+                    <p>Cantidad total de colectores registrados en cada ubicación.</p>
                 </div>
-
-                <div class="icono-busqueda">
-                    🔍
-                </div>
-
-            </div>
-
-            <form
-                action="{{ url_for('buscar_colector') }}"
-                method="GET"
-                class="formulario-busqueda"
-            >
-
-                <div class="campo-busqueda">
-
-                    <label for="consulta">
-                        6 o más caracteres de la serie o usuario asignado
-                    </label>
-
-                    <input
-                        type="text"
-                        id="consulta"
-                        name="consulta"
-                        value="{{ consulta or '' }}"
-                        placeholder="Ejemplo: 301251 o JULIO BENITEZ"
-                        autocomplete="off"
-                    >
-
-                </div>
-<button
-                    type="submit"
-                    class="boton-buscar"
-                >
-                    <span>🔍</span>
-                    Buscar colector
+                <button type="button" class="btn-secundario btn-pequeno" id="btnVerUbicaciones">
+                    Ver todas
                 </button>
-
-                {% if consulta %}
-
-                    <a
-                        href="{{ url_for('inicio') }}"
-                        class="boton-limpiar-busqueda"
-                    >
-                        Limpiar búsqueda
-                    </a>
-
-                {% endif %}
-
-            </form>
-
-        </section>
-
-        {% if consulta %}
-
-            <section class="seccion-resultados">
-
-                <div class="encabezado-resultados">
-
-                    <div>
-                        <span class="subtitulo-tarjeta">
-                            RESULTADO DE LA CONSULTA
-                        </span>
-
-                        <h2>Colectores encontrados</h2>
-
-                        <p>
-                            Búsqueda realizada por:
-                            <strong>{{ consulta }}</strong>
-                        </p>
-                    </div>
-
-                    <span class="cantidad-resultados">
-                        {{ resultados|length }}
-
-                        {% if resultados|length == 1 %}
-                            colector
-                        {% else %}
-                            colectores
-                        {% endif %}
-                    </span>
-
-                </div>
-
-                {% if resultados %}
-
-                    <div class="lista-resultados">
-
-                        {% for equipo in resultados %}
-
-                            <article class="tarjeta-resultado">
-
-                                <div class="resultado-superior">
-
-                                    <div class="identificacion-equipo">
-
-                                        <div class="icono-equipo">
-                                            ✏️
-                                        </div>
-
-                                        <div>
-                                            <span class="etiqueta-equipo">
-                                                EDICIÓN DEL REGISTRO
-                                            </span>
-
-                                            <h3>
-                                                {{ equipo.usuario_asignado or
-                                                   'Usuario no asignado' }}
-                                            </h3>
-                                        </div>
-
-                                    </div>
-
-                                    <span class="numero-item">
-                                        Fila {{ equipo.fila }}
-                                    </span>
-
-                                </div>
-
-                                <form
-                                    action="{{ url_for('editar_colector') }}"
-                                    method="POST"
-                                    class="formulario formulario-edicion"
-                                >
-
-                                    <input
-                                        type="hidden"
-                                        name="fila"
-                                        value="{{ equipo.fila }}"
-                                    >
-
-                                    <input
-                                        type="hidden"
-                                        name="consulta"
-                                        value="{{ consulta }}"
-                                    >
-
-                                    <input
-                                        type="hidden"
-                                        name="serie_original"
-                                        value="{{ equipo.serie }}"
-                                    >
-
-                                    <div class="campo">
-
-                                        <label for="editar_item_{{ equipo.fila }}">
-                                            Item
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            id="editar_item_{{ equipo.fila }}"
-                                            name="item"
-                                            value="{{ equipo.item }}"
-                                            autocomplete="off"
-                                            required
-                                        >
-
-                                    </div>
-
-                                    <div class="campo">
-
-                                        <label for="editar_serie_{{ equipo.fila }}">
-                                            Número de serie
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            id="editar_serie_{{ equipo.fila }}"
-                                            name="serie"
-                                            value="{{ equipo.serie }}"
-                                            autocomplete="off"
-                                            required
-                                        >
-
-                                    </div>
-
-                                    <div class="campo">
-
-                                        <label for="editar_estado_{{ equipo.fila }}">
-                                            Estado
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            id="editar_estado_{{ equipo.fila }}"
-                                            name="estado"
-                                            value="{{ equipo.estado }}"
-                                            list="lista_estado"
-                                            autocomplete="off"
-                                            required
-                                        >
-
-                                    </div>
-
-                                    <div class="campo">
-
-                                        <label for="editar_ubicacion_{{ equipo.fila }}">
-                                            Control de ubicación
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            id="editar_ubicacion_{{ equipo.fila }}"
-                                            name="ubicacion"
-                                            value="{{ equipo.ubicacion }}"
-                                            list="lista_ubicacion"
-                                            autocomplete="off"
-                                            required
-                                        >
-
-                                    </div>
-
-                                    <div class="campo">
-
-                                        <label for="editar_usuario_{{ equipo.fila }}">
-                                            Usuario asignado
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            id="editar_usuario_{{ equipo.fila }}"
-                                            name="usuario_asignado"
-                                            value="{{ equipo.usuario_asignado }}"
-                                            autocomplete="off"
-                                        >
-
-                                    </div>
-
-                                    <div class="campo">
-
-                                        <label for="editar_accesorio_{{ equipo.fila }}">
-                                            Accesorio
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            id="editar_accesorio_{{ equipo.fila }}"
-                                            name="accesorio"
-                                            value="{{ equipo.accesorio }}"
-                                            list="lista_accesorio"
-                                            autocomplete="off"
-                                        >
-
-                                    </div>
-
-                                    <div class="campo">
-
-                                        <label for="editar_reasignacion_{{ equipo.fila }}">
-                                            Condición de reasignación
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            id="editar_reasignacion_{{ equipo.fila }}"
-                                            name="reasignacion"
-                                            value="{{ equipo.reasignacion }}"
-                                            list="lista_reasignacion"
-                                            autocomplete="off"
-                                        >
-
-                                    </div>
-
-                                    <div class="campo">
-
-                                        <label for="editar_condicion_{{ equipo.fila }}">
-                                            Condición del colector
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            id="editar_condicion_{{ equipo.fila }}"
-                                            name="condicion"
-                                            value="{{ equipo.condicion }}"
-                                            list="lista_condicion"
-                                            autocomplete="off"
-                                        >
-
-                                    </div>
-
-                                    <div class="campo campo-completo">
-
-                                        <label for="editar_observacion_{{ equipo.fila }}">
-                                            Observación
-                                        </label>
-
-                                        <textarea
-                                            id="editar_observacion_{{ equipo.fila }}"
-                                            name="observacion"
-                                            rows="4"
-                                        >{{ equipo.observacion }}</textarea>
-
-                                    </div>
-
-                                    <div class="acciones campo-completo">
-
-                                        <button
-                                            type="submit"
-                                            class="boton-principal"
-                                        >
-                                            <span>💾</span>
-                                            Actualizar colector
-                                        </button>
-
-                                    </div>
-
-                                </form>
-
-                            </article>
-
-                        {% endfor %}
-
-                    </div>
-
-                {% else %}
-
-                    <div class="sin-resultados">
-
-                        <div class="icono-sin-resultados">
-                            🔎
-                        </div>
-
-                        <h3>No se encontraron colectores</h3>
-
-                        <p>
-                            Verifica que hayas escrito al menos 6 caracteres de la serie,
-                            la serie completa o el nombre del usuario.
-                        </p>
-
-                    </div>
-
-                {% endif %}
-
-            </section>
-
-        {% endif %}
-
-        <section class="tarjeta-formulario">
-
-            <div class="titulo-seccion">
-
-                <div>
-                    <span class="subtitulo-tarjeta">
-                        NUEVO REGISTRO
-                    </span>
-
-                    <h2>Registrar colector</h2>
-
-                    <p>
-                        Completa los datos del colector para guardarlos
-                        en Google Sheets.
-                    </p>
-                </div>
-
-                <span class="estado-conexion">
-                    ● Conectado
-                </span>
-
             </div>
 
-            <form
-                action="{{ url_for('colector') }}"
-                method="POST"
-                class="formulario"
-            >
+            <div class="ubicaciones-grid" id="ubicacionesGrid">
+                {% for ubicacion in resumen_ubicaciones %}
+                    <article class="ubicacion-card {% if loop.index > 6 %}ubicacion-extra oculto{% endif %}">
+                        <span class="ubicacion-nombre">{{ ubicacion.nombre }}</span>
+                        <strong>{{ ubicacion.cantidad }}</strong>
+                        <small>colectores</small>
+                    </article>
+                {% else %}
+                    <p class="texto-vacio">Todavía no hay ubicaciones registradas.</p>
+                {% endfor %}
+            </div>
+        </section>
 
+        <!-- FORMULARIO -->
+        <section class="panel">
+            <div class="cabecera-panel">
+                <div>
+                    <h2>Registrar colector</h2>
+                    <p>Completa los datos y guarda el registro en Google Sheets.</p>
+                </div>
+                <span class="conexion">● Conectado</span>
+            </div>
+
+            <form action="{{ url_for('colector') }}" method="POST" class="form-grid" id="formRegistro">
                 <div class="campo">
-
-                    <label for="item">
-                        <span class="icono-campo">#</span>
-                        Item
-                    </label>
-
-                    <input
-                        type="text"
-                        id="item"
-                        name="item"
-                        placeholder="Ejemplo: 1"
-                        autocomplete="off"
-                        required
-                    >
-
+                    <label for="item">Número de item</label>
+                    <input type="text" id="item" name="item" placeholder="Ejemplo: 1" required>
                 </div>
 
                 <div class="campo">
-
-                    <label for="serie">
-                        <span class="icono-campo">⌁</span>
-                        Número de serie
-                    </label>
-
-                    <input
-                        type="text"
-                        id="serie"
-                        name="serie"
-                        placeholder="Ejemplo: HC660BA240301251"
-                        autocomplete="off"
-                        required
-                    >
-
+                    <label for="serie">Número de serie</label>
+                    <input type="text" id="serie" name="serie" placeholder="Ejemplo: HC660BA240301251" required>
                 </div>
 
                 <div class="campo">
-
-                    <label for="estado">
-                        <span class="icono-campo">📍</span>
-                        Estado
-                    </label>
-
-                    <input
-                        type="text"
-                        id="estado"
-                        name="estado"
-                        list="lista_estado"
-                        placeholder="Escriba o seleccione una opción"
-                        autocomplete="off"
-                        required
-                    >
-
-                                        <datalist id="lista_estado">
-                        <option value="LOCALIZADO">
-                        <option value="NO LOCALIZADO">
-                        <option value="EXTRAVIADO">
-                    </datalist>
-
+                    <label for="estado">Estado</label>
+                    <select id="estado" name="estado" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="LOCALIZADO">LOCALIZADO</option>
+                        <option value="NO LOCALIZADO">NO LOCALIZADO</option>
+                        <option value="EXTRAVIADO">EXTRAVIADO</option>
+                    </select>
                 </div>
 
                 <div class="campo">
-
-                    <label for="ubicacion">
-                        <span class="icono-campo">🏢</span>
-                        Control de ubicación
-                    </label>
-
-                    <input
-                        type="text"
-                        id="ubicacion"
-                        name="ubicacion"
-                        list="lista_ubicacion"
-                        placeholder="Escriba o seleccione una opción"
-                        autocomplete="off"
-                        required
-                    >
-
-                                        <datalist id="lista_ubicacion">
-                        <option value="Nave central">
-                        <option value="Soporte">
-                        <option value="Empaque pickup">
-                        <option value="CD2">
-                        <option value="Empaque tupi">
-                        <option value="Transportadora">
-                        <option value="Autos">
-                        <option value="Deposito MKP">
-                        <option value="Toke">
-                        <option value="Auditoria de stock">
-                        <option value="Deposito 669">
-                        <option value="Proveedor">
-                        <option value="Schulz">
-                        <option value="CDE">
-                        <option value="CDI">
-                        <option value="CD3">
-                        <option value="Salon Tupi PB">
-                        <option value="Segel">
-                        <option value="Abastecimiento MKP">
-                        <option value="Saldo">
-                        <option value="EMPAQUE PB MKP">
-                        <option value="TRASTIENDA PB">
-                        <option value="TRASTIENDA PISO 1">
-                        <option value="PICKING MKP">
-                        <option value="FAC">
-                        <option value="Shopping">
-                    </datalist>
-
+                    <label for="ubicacion">Control de ubicación</label>
+                    <input type="text" id="ubicacion" name="ubicacion" list="lista_ubicacion"
+                           placeholder="Escribe o selecciona una ubicación" required>
                 </div>
 
                 <div class="campo">
-
-                    <label for="usuario_asignado">
-                        <span class="icono-campo">👤</span>
-                        Usuario asignado
-                    </label>
-
-                    <input
-                        type="text"
-                        id="usuario_asignado"
-                        name="usuario_asignado"
-                        placeholder="Ejemplo: JULIO BENITEZ"
-                        autocomplete="off"
-                    >
-
+                    <label for="usuario_asignado">Usuario asignado</label>
+                    <input type="text" id="usuario_asignado" name="usuario_asignado"
+                           placeholder="Nombre del usuario">
                 </div>
 
                 <div class="campo">
-
-                    <label for="accesorio">
-                        <span class="icono-campo">🔌</span>
-                        Accesorio
-                    </label>
-
-                    <input
-                        type="text"
-                        id="accesorio"
-                        name="accesorio"
-                        list="lista_accesorio"
-                        placeholder="Escriba o seleccione una opción"
-                        autocomplete="off"
-                    >
-
-                                        <datalist id="lista_accesorio">
-                        <option value="Con cargador">
-                        <option value="Sin cargador">
-                        <option value="Con base">
-                        <option value="Sin base">
-                        <option value="Completo">
-                    </datalist>
-
+                    <label for="accesorio">Accesorio</label>
+                    <input type="text" id="accesorio" name="accesorio" list="lista_accesorio"
+                           placeholder="Escribe o selecciona una opción">
                 </div>
 
                 <div class="campo">
-
-                    <label for="reasignacion">
-                        <span class="icono-campo">🔄</span>
-                        Condición de reasignación
-                    </label>
-
-                    <input
-                        type="text"
-                        id="reasignacion"
-                        name="reasignacion"
-                        list="lista_reasignacion"
-                        placeholder="Escriba o seleccione una opción"
-                        autocomplete="off"
-                    >
-
-                                        <datalist id="lista_reasignacion">
-                        <option value="Reasignar">
-                        <option value="No Reasignar">
-                        <option value="Verificar si Funciona en Soporte">
-                        <option value="Para Reparacion">
-                        <option value="Con Usuario">
-                        <option value="Con el Proveedor">
-                    </datalist>
-
+                    <label for="reasignacion">Condición de reasignación</label>
+                    <input type="text" id="reasignacion" name="reasignacion" list="lista_reasignacion"
+                           placeholder="Escribe o selecciona una opción">
                 </div>
 
                 <div class="campo">
-
-                    <label for="condicion">
-                        <span class="icono-campo">🛠️</span>
-                        Condición del colector
-                    </label>
-
-                    <input
-                        type="text"
-                        id="condicion"
-                        name="condicion"
-                        list="lista_condicion"
-                        placeholder="Escriba o seleccione una opción"
-                        autocomplete="off"
-                    >
-
-                                        <datalist id="lista_condicion">
-                        <option value="Operativo">
-                        <option value="Defectuoso de Soporte">
-                        <option value="En Buenas condiciones">
-                        <option value="En reparacion con el Proveedor">
-                        <option value="Fuera de Servicio">
-                        <option value="Para llevar a Reparar">
-                        <option value="Antes de Asignar ver si funciona en Soporte">
-                        <option value="En reparacion">
-                        <option value="Boton de Lector Sensible">
-                        <option value="Defectuoso de Departamentos">
-                    </datalist>
-
+                    <label for="condicion">Condición del colector</label>
+                    <input type="text" id="condicion" name="condicion" list="lista_condicion"
+                           placeholder="Escribe o selecciona una opción">
                 </div>
 
                 <div class="campo campo-completo">
-
-                    <label for="observacion">
-                        <span class="icono-campo">✎</span>
-                        Observación
-                    </label>
-
-                    <textarea
-                        id="observacion"
-                        name="observacion"
-                        rows="5"
-                        placeholder="Escribe aquí cualquier información adicional sobre el colector..."
-                    ></textarea>
-
+                    <label for="observacion">Observación</label>
+                    <textarea id="observacion" name="observacion" rows="3"
+                              placeholder="Ingresa una observación"></textarea>
                 </div>
 
-                <div class="acciones campo-completo">
-
-                    <button
-                        type="reset"
-                        class="boton-secundario"
-                    >
-                        Limpiar campos
-                    </button>
-
-                    <button
-                        type="submit"
-                        class="boton-principal"
-                    >
-                        <span>💾</span>
-                        Guardar colector
-                    </button>
-
+                <div class="acciones-form campo-completo">
+                    <button type="reset" class="btn-secundario">Limpiar</button>
+                    <button type="submit" class="btn-guardar">Guardar colector</button>
                 </div>
-
             </form>
-
         </section>
 
-        <footer>
-            Sistema de inventario de colectores
-        </footer>
+        <!-- TABLA DE REGISTROS -->
+        <section class="panel panel-tabla">
+            <div class="cabecera-tabla">
+                <div>
+                    <h2>Colectores registrados</h2>
+                    <p>Consulta, busca y edita tus registros.</p>
+                </div>
 
+                <div class="buscador-tabla">
+                    <span>⌕</span>
+                    <input type="search" id="buscarTabla"
+                           placeholder="Buscar serie, usuario, ubicación...">
+                </div>
+            </div>
+
+            <div class="tabla-scroll">
+                <table id="tablaColectores">
+                    <thead>
+                        <tr>
+                            <th>ITEM</th>
+                            <th>SERIE</th>
+                            <th>ESTADO</th>
+                            <th>UBICACIÓN</th>
+                            <th>USUARIO</th>
+                            <th>CONDICIÓN</th>
+                            <th>ACCESORIO</th>
+                            <th>OBSERVACIÓN</th>
+                            <th>ACCIONES</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for equipo in registros %}
+                            <tr>
+                                <td>{{ equipo.item }}</td>
+                                <td class="serie-tabla">{{ equipo.serie }}</td>
+                                <td>
+                                    <span class="badge estado-{{ equipo.estado|lower|replace(' ', '-') }}">
+                                        {{ equipo.estado or 'Sin estado' }}
+                                    </span>
+                                </td>
+                                <td>{{ equipo.ubicacion }}</td>
+                                <td>{{ equipo.usuario_asignado or 'Sin usuario' }}</td>
+                                <td>
+                                    <span class="badge badge-condicion">
+                                        {{ equipo.condicion or 'Sin condición' }}
+                                    </span>
+                                </td>
+                                <td>{{ equipo.accesorio or '-' }}</td>
+                                <td class="celda-observacion">{{ equipo.observacion or '-' }}</td>
+                                <td>
+                                    <div class="acciones-tabla">
+                                        <button
+                                            type="button"
+                                            class="btn-editar"
+                                            data-fila="{{ equipo.fila }}"
+                                            data-item="{{ equipo.item|e }}"
+                                            data-serie="{{ equipo.serie|e }}"
+                                            data-estado="{{ equipo.estado|e }}"
+                                            data-ubicacion="{{ equipo.ubicacion|e }}"
+                                            data-usuario="{{ equipo.usuario_asignado|e }}"
+                                            data-accesorio="{{ equipo.accesorio|e }}"
+                                            data-reasignacion="{{ equipo.reasignacion|e }}"
+                                            data-condicion="{{ equipo.condicion|e }}"
+                                            data-observacion="{{ equipo.observacion|e }}"
+                                        >
+                                            Editar
+                                        </button>
+
+                                        <form action="{{ url_for('eliminar_colector') }}"
+                                              method="POST"
+                                              class="form-eliminar"
+                                              onsubmit="return confirmarEliminacion(this);">
+                                            <input type="hidden" name="fila" value="{{ equipo.fila }}">
+                                            <input type="hidden" name="serie_original" value="{{ equipo.serie }}">
+                                            <button type="submit" class="btn-eliminar">Eliminar</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="9" class="sin-registros">
+                                    No hay colectores registrados.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pie-tabla">
+                <span id="contadorFilas">Mostrando {{ registros|length }} registros</span>
+            </div>
+        </section>
+
+        <footer class="footer">Sistema de inventario de colectores</footer>
     </main>
 
-</body>
+    <!-- LISTAS -->
+    <datalist id="lista_ubicacion">
+        {% for valor in opciones.ubicaciones %}
+            <option value="{{ valor }}">
+        {% endfor %}
+    </datalist>
 
+    <datalist id="lista_accesorio">
+        <option value="Con cargador">
+        <option value="Sin cargador">
+        <option value="Con base">
+        <option value="Sin base">
+        <option value="Completo">
+    </datalist>
+
+    <datalist id="lista_reasignacion">
+        <option value="Reasignar">
+        <option value="No Reasignar">
+        <option value="Verificar si Funciona en Soporte">
+        <option value="Para Reparacion">
+        <option value="Con Usuario">
+        <option value="Con el Proveedor">
+    </datalist>
+
+    <datalist id="lista_condicion">
+        {% for valor in opciones.condiciones %}
+            <option value="{{ valor }}">
+        {% endfor %}
+        <option value="Operativo">
+        <option value="Defectuoso de Soporte">
+        <option value="En Buenas condiciones">
+        <option value="En reparacion con el Proveedor">
+        <option value="Fuera de Servicio">
+        <option value="Para llevar a Reparar">
+        <option value="Antes de Asignar ver si funciona en Soporte">
+        <option value="En reparacion">
+        <option value="Boton de Lector Sensible">
+        <option value="Defectuoso de Departamentos">
+    </datalist>
+
+    <!-- MODAL EDICIÓN -->
+    <div class="modal-fondo" id="modalEdicion" aria-hidden="true">
+        <div class="modal">
+            <div class="modal-cabecera">
+                <div>
+                    <span class="modal-etiqueta">EDITAR REGISTRO</span>
+                    <h2>Editar colector</h2>
+                </div>
+                <button type="button" class="modal-cerrar" id="cerrarModal">×</button>
+            </div>
+
+            <form action="{{ url_for('editar_colector') }}" method="POST" class="form-grid">
+                <input type="hidden" name="fila" id="edit_fila">
+                <input type="hidden" name="serie_original" id="edit_serie_original">
+                <input type="hidden" name="consulta" value="">
+
+                <div class="campo">
+                    <label for="edit_item">Número de item</label>
+                    <input type="text" id="edit_item" name="item" required>
+                </div>
+
+                <div class="campo">
+                    <label for="edit_serie">Número de serie</label>
+                    <input type="text" id="edit_serie" name="serie" required>
+                </div>
+
+                <div class="campo">
+                    <label for="edit_estado">Estado</label>
+                    <select id="edit_estado" name="estado" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="LOCALIZADO">LOCALIZADO</option>
+                        <option value="NO LOCALIZADO">NO LOCALIZADO</option>
+                        <option value="EXTRAVIADO">EXTRAVIADO</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="edit_ubicacion">Control de ubicación</label>
+                    <input type="text" id="edit_ubicacion" name="ubicacion" list="lista_ubicacion" required>
+                </div>
+
+                <div class="campo">
+                    <label for="edit_usuario">Usuario asignado</label>
+                    <input type="text" id="edit_usuario" name="usuario_asignado">
+                </div>
+
+                <div class="campo">
+                    <label for="edit_accesorio">Accesorio</label>
+                    <input type="text" id="edit_accesorio" name="accesorio" list="lista_accesorio">
+                </div>
+
+                <div class="campo">
+                    <label for="edit_reasignacion">Condición de reasignación</label>
+                    <input type="text" id="edit_reasignacion" name="reasignacion" list="lista_reasignacion">
+                </div>
+
+                <div class="campo">
+                    <label for="edit_condicion">Condición del colector</label>
+                    <input type="text" id="edit_condicion" name="condicion" list="lista_condicion">
+                </div>
+
+                <div class="campo campo-completo">
+                    <label for="edit_observacion">Observación</label>
+                    <textarea id="edit_observacion" name="observacion" rows="3"></textarea>
+                </div>
+
+                <div class="acciones-form campo-completo">
+                    <button type="button" class="btn-secundario" id="cancelarModal">Cancelar</button>
+                    <button type="submit" class="btn-guardar">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const buscador = document.getElementById("buscarTabla");
+        const tabla = document.getElementById("tablaColectores");
+        const contador = document.getElementById("contadorFilas");
+
+        buscador.addEventListener("input", function () {
+            const texto = this.value.trim().toLowerCase();
+            const filas = tabla.querySelectorAll("tbody tr");
+            let visibles = 0;
+
+            filas.forEach(fila => {
+                if (fila.querySelector(".sin-registros")) return;
+
+                const coincide = fila.innerText.toLowerCase().includes(texto);
+                fila.style.display = coincide ? "" : "none";
+                if (coincide) visibles++;
+            });
+
+            contador.textContent = `Mostrando ${visibles} registro${visibles === 1 ? "" : "s"}`;
+        });
+
+        const modal = document.getElementById("modalEdicion");
+        const cerrarModal = document.getElementById("cerrarModal");
+        const cancelarModal = document.getElementById("cancelarModal");
+
+        document.querySelectorAll(".btn-editar").forEach(boton => {
+            boton.addEventListener("click", () => {
+                document.getElementById("edit_fila").value = boton.dataset.fila;
+                document.getElementById("edit_item").value = boton.dataset.item;
+                document.getElementById("edit_serie").value = boton.dataset.serie;
+                document.getElementById("edit_serie_original").value = boton.dataset.serie;
+                document.getElementById("edit_estado").value = boton.dataset.estado;
+                document.getElementById("edit_ubicacion").value = boton.dataset.ubicacion;
+                document.getElementById("edit_usuario").value = boton.dataset.usuario;
+                document.getElementById("edit_accesorio").value = boton.dataset.accesorio;
+                document.getElementById("edit_reasignacion").value = boton.dataset.reasignacion;
+                document.getElementById("edit_condicion").value = boton.dataset.condicion;
+                document.getElementById("edit_observacion").value = boton.dataset.observacion;
+
+                modal.classList.add("activo");
+                modal.setAttribute("aria-hidden", "false");
+                document.body.classList.add("modal-abierto");
+            });
+        });
+
+        function cerrarEdicion() {
+            modal.classList.remove("activo");
+            modal.setAttribute("aria-hidden", "true");
+            document.body.classList.remove("modal-abierto");
+        }
+
+        cerrarModal.addEventListener("click", cerrarEdicion);
+        cancelarModal.addEventListener("click", cerrarEdicion);
+
+        modal.addEventListener("click", e => {
+            if (e.target === modal) cerrarEdicion();
+        });
+
+        document.addEventListener("keydown", e => {
+            if (e.key === "Escape") cerrarEdicion();
+        });
+
+        function confirmarEliminacion(formulario) {
+            return confirm("¿Seguro que querés eliminar este colector? Esta acción también lo elimina de Google Sheets.");
+        }
+
+        const btnVerUbicaciones = document.getElementById("btnVerUbicaciones");
+        const extras = document.querySelectorAll(".ubicacion-extra");
+        let mostrandoTodas = false;
+
+        if (extras.length === 0) {
+            btnVerUbicaciones.style.display = "none";
+        }
+
+        btnVerUbicaciones.addEventListener("click", () => {
+            mostrandoTodas = !mostrandoTodas;
+
+            extras.forEach(card => {
+                card.classList.toggle("oculto", !mostrandoTodas);
+            });
+
+            btnVerUbicaciones.textContent = mostrandoTodas ? "Ver menos" : "Ver todas";
+        });
+    </script>
+</body>
 </html>
