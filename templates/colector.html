@@ -789,7 +789,7 @@
         });
 
 
-        // ETIQUETA HONEYWELL 70 x 25 mm
+        // ETIQUETA HONEYWELL 70 x 25 mm - LOGO TUPI
         function imprimirEtiqueta(boton) {
             const datos = {
                 serie: boton.dataset.serie || "-",
@@ -797,12 +797,12 @@
                 departamento: boton.dataset.ubicacion || "Sin departamento",
                 condicion: boton.dataset.condicion || "Sin condición"
             };
+            const logoUrl = {{ url_for('static', filename='TUPI-ETIQUETA.png') | tojson }};
             const ventana = window.open("", "_blank", "width=760,height=420");
             if (!ventana) {
                 alert("Permití las ventanas emergentes para imprimir la etiqueta.");
                 return;
             }
-            // textContent evita interpretar como HTML los datos ingresados.
             const documento = ventana.document;
             documento.open();
             documento.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Etiqueta colector</title>
@@ -811,25 +811,32 @@
             * { box-sizing: border-box; }
             html, body { width: 70mm; height: 25mm; margin: 0; padding: 0; }
             body { font-family: Arial, sans-serif; color: #000; }
-            .etiqueta { width: 70mm; height: 25mm; padding: 1.4mm 2mm; overflow: hidden; }
-            .titulo { font-size: 8pt; font-weight: 800; text-align: center; border-bottom: .25mm solid #000; padding-bottom: .5mm; margin-bottom: .6mm; }
-            .dato { font-size: 7.5pt; line-height: 1.18; margin: .3mm 0; overflow-wrap: anywhere; }
+            .etiqueta { width: 70mm; height: 25mm; padding: 1mm; overflow: hidden; display: flex; align-items: center; gap: 1.5mm; border: .3mm solid #000; border-radius: 1.3mm; }
+            .logo { width: 18mm; height: 21mm; object-fit: contain; flex-shrink: 0; }
+            .contenido { min-width: 0; flex: 1; }
+            .titulo { font-size: 7.2pt; font-weight: 800; text-align: center; border-bottom: .25mm solid #000; padding-bottom: .6mm; margin-bottom: .8mm; white-space: nowrap; }
+            .dato { font-size: 6.5pt; line-height: 1.16; margin: .4mm 0; overflow-wrap: anywhere; }
             .dato b { font-weight: 800; }
-            @media screen { body { margin: 20px; border: 1px solid #aaa; } }
-            @media print { body { margin: 0; border: 0; } }
+            @media screen { body { margin: 20px; } }
+            @media print { body { margin: 0; } }
             </style></head><body><div class="etiqueta">
-            <div class="titulo">CONTROL DE COLECTOR</div>
+            <img class="logo" id="et-logo" alt="Logo TUPI">
+            <div class="contenido"><div class="titulo">CONTROL DE COLECTOR</div>
             <div class="dato"><b>Serie:</b> <span id="et-serie"></span></div>
             <div class="dato"><b>Nombre:</b> <span id="et-nombre"></span></div>
             <div class="dato"><b>Departamento:</b> <span id="et-departamento"></span></div>
             <div class="dato"><b>Condición:</b> <span id="et-condicion"></span></div>
-            </div></body></html>`);
+            </div></div></body></html>`);
             documento.close();
             for (const [clave, valor] of Object.entries(datos)) {
                 documento.getElementById("et-" + clave).textContent = valor;
             }
-            ventana.focus();
-            setTimeout(() => ventana.print(), 300);
+            const logo = documento.getElementById("et-logo");
+            const imprimir = () => { ventana.focus(); ventana.print(); };
+            logo.onload = imprimir;
+            logo.onerror = imprimir;
+            logo.src = logoUrl;
+            if (logo.complete) setTimeout(imprimir, 350);
         }
 
         // ==========================================
