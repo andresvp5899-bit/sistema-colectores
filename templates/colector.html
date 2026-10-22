@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -8,25 +9,48 @@
 </head>
 
 <body class="pagina-sistema">
-    <header class="hero">
-        <div class="hero-contenido">
-            <div>
-                <span class="hero-etiqueta">INVENTARIO DE ACTIVOS</span>
-                <h1>Inventario de Colectores</h1>
-                <p>Registro, control de ubicación, búsqueda y administración de colectores.</p>
-            </div>
 
-            <a href="{{ url_for('logout') }}" class="btn-cerrar">Cerrar sesión</a>
+    <!-- ENCABEZADO -->
+<header class="hero">
+    <div class="hero-contenido">
+
+        <div class="hero-logo">
+            <img
+                src="{{ url_for('static', filename='TUPI-DEMO.webp') }}"
+                alt="Logo TUPI"
+            >
         </div>
-    </header>
+
+        <div class="hero-informacion">
+            <span class="hero-etiqueta">
+                SOPORTE TÉCNICO · TUPI RUVICHA
+            </span>
+
+            <h1>Inventario de Colectores</h1>
+
+            <p>
+                Gestión de inventario, ubicación y control de colectores.
+            </p>
+        </div>
+
+        <div class="hero-estado">
+            <span class="estado-punto"></span>
+            Sistema de gestión
+        </div>
+
+    </div>
+</header>
 
     <main class="contenedor-principal">
 
+        <!-- MENSAJES -->
         {% with mensajes = get_flashed_messages(with_categories=true) %}
             {% if mensajes %}
                 <div class="mensajes">
                     {% for categoria, mensaje in mensajes %}
-                        <div class="mensaje {{ categoria }}">{{ mensaje }}</div>
+                        <div class="mensaje {{ categoria }}">
+                            {{ mensaje }}
+                        </div>
                     {% endfor %}
                 </div>
             {% endif %}
@@ -34,6 +58,7 @@
 
         <!-- TARJETAS PRINCIPALES -->
         <section class="grid-estadisticas">
+
             <article class="stat stat-azul">
                 <span>TOTAL DE COLECTORES</span>
                 <strong>{{ resumen.total }}</strong>
@@ -53,213 +78,355 @@
                 <span>EXTRAVIADOS</span>
                 <strong>{{ resumen.extraviados }}</strong>
             </article>
+
         </section>
 
         <!-- COLECTORES POR UBICACIÓN -->
         <section class="panel">
+
             <div class="cabecera-panel">
                 <div>
                     <h2>Colectores por ubicación</h2>
-                    <p>Cantidad total de colectores registrados en cada ubicación.</p>
+                    <p>
+                        Cantidad total de colectores registrados
+                        en cada ubicación.
+                    </p>
                 </div>
-                <button type="button" class="btn-secundario btn-pequeno" id="btnVerUbicaciones">
+
+                <button
+                    type="button"
+                    class="btn-secundario btn-pequeno"
+                    id="btnVerUbicaciones"
+                >
                     Ver todas
                 </button>
             </div>
 
             <div class="ubicaciones-grid" id="ubicacionesGrid">
+
                 {% for ubicacion in resumen_ubicaciones %}
+
                     <article class="ubicacion-card {% if loop.index > 6 %}ubicacion-extra oculto{% endif %}">
-                        <span class="ubicacion-nombre">{{ ubicacion.nombre }}</span>
+                        <span class="ubicacion-nombre">
+                            {{ ubicacion.nombre }}
+                        </span>
+
                         <strong>{{ ubicacion.cantidad }}</strong>
                         <small>colectores</small>
                     </article>
+
                 {% else %}
-                    <p class="texto-vacio">Todavía no hay ubicaciones registradas.</p>
+
+                    <p class="texto-vacio">
+                        Todavía no hay ubicaciones registradas.
+                    </p>
+
                 {% endfor %}
+
             </div>
         </section>
 
-        <!-- FORMULARIO -->
+        <!-- FORMULARIO DE REGISTRO -->
         <section class="panel">
+
             <div class="cabecera-panel">
                 <div>
                     <h2>Registrar colector</h2>
-                    <p>Completa los datos y guarda el registro en Google Sheets.</p>
+                    <p>
+                        Completa los datos y guarda el registro
+                        en Google Sheets.
+                    </p>
                 </div>
-                <span class="conexion">● Conectado</span>
             </div>
 
-            <form action="{{ url_for('colector') }}" method="POST" class="form-grid" id="formRegistro">
-                <div class="campo">
-                    <label for="item">Número de item</label>
-                    <input type="text" id="item" name="item" placeholder="Ejemplo: 1" required>
-                </div>
+            <form
+                action="{{ url_for('colector') }}"
+                method="POST"
+                class="form-grid"
+                id="formRegistro"
+            >
 
+                <!-- NÚMERO DE SERIE -->
                 <div class="campo">
                     <label for="serie">Número de serie</label>
-                    <input type="text" id="serie" name="serie" placeholder="Ejemplo: HC660BA240301251" required>
+                    <input
+                        type="text"
+                        id="serie"
+                        name="serie"
+                        placeholder="Ejemplo: HC660BA240301251"
+                        required
+                    >
                 </div>
 
+                <!-- ESTADO -->
                 <div class="campo">
                     <label for="estado">Estado</label>
-                    <select id="estado" name="estado" required>
-                        <option value="">Seleccionar...</option>
-                        <option value="LOCALIZADO">LOCALIZADO</option>
-                        <option value="NO LOCALIZADO">NO LOCALIZADO</option>
-                        <option value="EXTRAVIADO">EXTRAVIADO</option>
-                    </select>
+                    <input
+                        type="text"
+                        id="estado"
+                        name="estado"
+                        list="lista_estado"
+                        placeholder="Escribe o selecciona un estado"
+                        required
+                    >
                 </div>
 
+                <!-- UBICACIÓN -->
                 <div class="campo">
                     <label for="ubicacion">Control de ubicación</label>
-                    <input type="text" id="ubicacion" name="ubicacion" list="lista_ubicacion"
-                           placeholder="Escribe o selecciona una ubicación" required>
+                    <input
+                        type="text"
+                        id="ubicacion"
+                        name="ubicacion"
+                        list="lista_ubicacion"
+                        placeholder="Escribe o selecciona una ubicación"
+                        required
+                    >
                 </div>
 
+                <!-- USUARIO -->
                 <div class="campo">
                     <label for="usuario_asignado">Usuario asignado</label>
-                    <input type="text" id="usuario_asignado" name="usuario_asignado"
-                           placeholder="Nombre del usuario">
+                    <input
+                        type="text"
+                        id="usuario_asignado"
+                        name="usuario_asignado"
+                        placeholder="Nombre del usuario"
+                    >
                 </div>
 
+                <!-- ACCESORIO -->
                 <div class="campo">
                     <label for="accesorio">Accesorio</label>
-                    <input type="text" id="accesorio" name="accesorio" list="lista_accesorio"
-                           placeholder="Escribe o selecciona una opción">
+                    <input
+                        type="text"
+                        id="accesorio"
+                        name="accesorio"
+                        list="lista_accesorio"
+                        placeholder="Escribe o selecciona una opción"
+                    >
                 </div>
 
-                <div class="campo">
-                    <label for="reasignacion">Condición de reasignación</label>
-                    <input type="text" id="reasignacion" name="reasignacion" list="lista_reasignacion"
-                           placeholder="Escribe o selecciona una opción">
-                </div>
-
+                <!-- CONDICIÓN -->
                 <div class="campo">
                     <label for="condicion">Condición del colector</label>
-                    <input type="text" id="condicion" name="condicion" list="lista_condicion"
-                           placeholder="Escribe o selecciona una opción">
+                    <input
+                        type="text"
+                        id="condicion"
+                        name="condicion"
+                        list="lista_condicion"
+                        placeholder="Escribe o selecciona una condición"
+                    >
                 </div>
 
+                <!-- OBSERVACIÓN -->
                 <div class="campo campo-completo">
                     <label for="observacion">Observación</label>
-                    <textarea id="observacion" name="observacion" rows="3"
-                              placeholder="Ingresa una observación"></textarea>
+                    <textarea
+                        id="observacion"
+                        name="observacion"
+                        rows="3"
+                        placeholder="Ingresa una observación"
+                    ></textarea>
                 </div>
 
+                <!-- BOTONES -->
                 <div class="acciones-form campo-completo">
-                    <button type="reset" class="btn-secundario">Limpiar</button>
-                    <button type="submit" class="btn-guardar">Guardar colector</button>
+                    <button type="reset" class="btn-secundario">
+                        Limpiar
+                    </button>
+
+                    <button type="submit" class="btn-guardar">
+                        Guardar colector
+                    </button>
                 </div>
+
             </form>
         </section>
 
         <!-- TABLA DE REGISTROS -->
         <section class="panel panel-tabla">
+
             <div class="cabecera-tabla">
+
                 <div>
                     <h2>Colectores registrados</h2>
-                    <p>Consulta, busca y edita tus registros.</p>
+                    <p>
+                        Consulta, busca, edita y elimina tus registros.
+                    </p>
                 </div>
 
                 <div class="buscador-tabla">
                     <span>⌕</span>
-                    <input type="search" id="buscarTabla"
-                           placeholder="Buscar serie, usuario, ubicación...">
+
+                    <input
+                        type="search"
+                        id="buscarTabla"
+                        placeholder="Buscar serie, usuario, ubicación..."
+                    >
                 </div>
+
             </div>
 
             <div class="tabla-scroll">
+
                 <table id="tablaColectores">
+
                     <thead>
                         <tr>
-                            <th>ITEM</th>
                             <th>SERIE</th>
                             <th>ESTADO</th>
                             <th>UBICACIÓN</th>
                             <th>USUARIO</th>
-                            <th>CONDICIÓN</th>
                             <th>ACCESORIO</th>
+                            <th>CONDICIÓN</th>
                             <th>OBSERVACIÓN</th>
                             <th>ACCIONES</th>
                         </tr>
                     </thead>
 
                     <tbody>
+
                         {% for equipo in registros %}
+
                             <tr>
-                                <td>{{ equipo.item }}</td>
-                                <td class="serie-tabla">{{ equipo.serie }}</td>
+
+                                <td class="serie-tabla">
+                                    {{ equipo.serie }}
+                                </td>
+
                                 <td>
                                     <span class="badge estado-{{ equipo.estado|lower|replace(' ', '-') }}">
                                         {{ equipo.estado or 'Sin estado' }}
                                     </span>
                                 </td>
-                                <td>{{ equipo.ubicacion }}</td>
-                                <td>{{ equipo.usuario_asignado or 'Sin usuario' }}</td>
+
+                                <td>
+                                    {{ equipo.ubicacion or '-' }}
+                                </td>
+
+                                <td>
+                                    {{ equipo.usuario_asignado or 'Sin usuario' }}
+                                </td>
+
+                                <td>
+                                    {{ equipo.accesorio or '-' }}
+                                </td>
+
                                 <td>
                                     <span class="badge badge-condicion">
                                         {{ equipo.condicion or 'Sin condición' }}
                                     </span>
                                 </td>
-                                <td>{{ equipo.accesorio or '-' }}</td>
-                                <td class="celda-observacion">{{ equipo.observacion or '-' }}</td>
+
+                                <td class="celda-observacion">
+                                    {{ equipo.observacion or '-' }}
+                                </td>
+
                                 <td>
+
                                     <div class="acciones-tabla">
+
+                                        <!-- EDITAR -->
                                         <button
                                             type="button"
                                             class="btn-editar"
                                             data-fila="{{ equipo.fila }}"
-                                            data-item="{{ equipo.item|e }}"
                                             data-serie="{{ equipo.serie|e }}"
                                             data-estado="{{ equipo.estado|e }}"
                                             data-ubicacion="{{ equipo.ubicacion|e }}"
                                             data-usuario="{{ equipo.usuario_asignado|e }}"
                                             data-accesorio="{{ equipo.accesorio|e }}"
-                                            data-reasignacion="{{ equipo.reasignacion|e }}"
                                             data-condicion="{{ equipo.condicion|e }}"
                                             data-observacion="{{ equipo.observacion|e }}"
                                         >
                                             Editar
                                         </button>
 
-                                        <form action="{{ url_for('eliminar_colector') }}"
-                                              method="POST"
-                                              class="form-eliminar"
-                                              onsubmit="return confirmarEliminacion(this);">
-                                            <input type="hidden" name="fila" value="{{ equipo.fila }}">
-                                            <input type="hidden" name="serie_original" value="{{ equipo.serie }}">
-                                            <button type="submit" class="btn-eliminar">Eliminar</button>
+                                        <!-- ELIMINAR -->
+                                        <form
+                                            action="{{ url_for('eliminar_colector') }}"
+                                            method="POST"
+                                            class="form-eliminar"
+                                            onsubmit="return confirmarEliminacion();"
+                                        >
+
+                                            <input
+                                                type="hidden"
+                                                name="fila"
+                                                value="{{ equipo.fila }}"
+                                            >
+
+                                            <input
+                                                type="hidden"
+                                                name="serie_original"
+                                                value="{{ equipo.serie }}"
+                                            >
+
+                                            <button
+                                                type="submit"
+                                                class="btn-eliminar"
+                                            >
+                                                Eliminar
+                                            </button>
+
                                         </form>
+
                                     </div>
+
                                 </td>
+
                             </tr>
+
                         {% else %}
+
                             <tr>
-                                <td colspan="9" class="sin-registros">
+                                <td colspan="8" class="sin-registros">
                                     No hay colectores registrados.
                                 </td>
                             </tr>
+
                         {% endfor %}
+
                     </tbody>
+
                 </table>
+
             </div>
 
             <div class="pie-tabla">
-                <span id="contadorFilas">Mostrando {{ registros|length }} registros</span>
+                <span id="contadorFilas">
+                    Mostrando {{ registros|length }} registros
+                </span>
             </div>
+
         </section>
 
-        <footer class="footer">Sistema de inventario de colectores</footer>
+        <footer class="footer">
+            Sistema de inventario de colectores
+        </footer>
+
     </main>
 
-    <!-- LISTAS -->
+    <!-- LISTA DE ESTADOS -->
+    <datalist id="lista_estado">
+        <option value="LOCALIZADO">
+        <option value="NO LOCALIZADO">
+        <option value="EXTRAVIADO">
+
+        {% for valor in opciones.estados %}
+            <option value="{{ valor }}">
+        {% endfor %}
+    </datalist>
+
+    <!-- LISTA DE UBICACIONES -->
     <datalist id="lista_ubicacion">
         {% for valor in opciones.ubicaciones %}
             <option value="{{ valor }}">
         {% endfor %}
     </datalist>
 
+    <!-- LISTA DE ACCESORIOS -->
     <datalist id="lista_accesorio">
         <option value="Con cargador">
         <option value="Sin cargador">
@@ -268,19 +435,13 @@
         <option value="Completo">
     </datalist>
 
-    <datalist id="lista_reasignacion">
-        <option value="Reasignar">
-        <option value="No Reasignar">
-        <option value="Verificar si Funciona en Soporte">
-        <option value="Para Reparacion">
-        <option value="Con Usuario">
-        <option value="Con el Proveedor">
-    </datalist>
-
+    <!-- LISTA DE CONDICIONES -->
     <datalist id="lista_condicion">
+
         {% for valor in opciones.condiciones %}
             <option value="{{ valor }}">
         {% endfor %}
+
         <option value="Operativo">
         <option value="Defectuoso de Soporte">
         <option value="En Buenas condiciones">
@@ -291,185 +452,385 @@
         <option value="En reparacion">
         <option value="Boton de Lector Sensible">
         <option value="Defectuoso de Departamentos">
+
     </datalist>
 
-    <!-- MODAL EDICIÓN -->
-    <div class="modal-fondo" id="modalEdicion" aria-hidden="true">
-        <div class="modal">
+    <!-- MODAL DE EDICIÓN -->
+    <div
+        class="modal-fondo"
+        id="modalEdicion"
+        aria-hidden="true"
+    >
+
+        <div
+            class="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="tituloModal"
+        >
+
             <div class="modal-cabecera">
+
                 <div>
-                    <span class="modal-etiqueta">EDITAR REGISTRO</span>
-                    <h2>Editar colector</h2>
+                    <span class="modal-etiqueta">
+                        EDITAR REGISTRO
+                    </span>
+
+                    <h2 id="tituloModal">Editar colector</h2>
                 </div>
-                <button type="button" class="modal-cerrar" id="cerrarModal">×</button>
+
+                <button
+                    type="button"
+                    class="modal-cerrar"
+                    id="cerrarModal"
+                    aria-label="Cerrar edición"
+                >
+                    ×
+                </button>
+
             </div>
 
-            <form action="{{ url_for('editar_colector') }}" method="POST" class="form-grid">
-                <input type="hidden" name="fila" id="edit_fila">
-                <input type="hidden" name="serie_original" id="edit_serie_original">
-                <input type="hidden" name="consulta" value="">
+            <form
+                action="{{ url_for('editar_colector') }}"
+                method="POST"
+                class="form-grid"
+                id="formEdicion"
+            >
 
-                <div class="campo">
-                    <label for="edit_item">Número de item</label>
-                    <input type="text" id="edit_item" name="item" required>
-                </div>
+                <!-- DATOS INTERNOS -->
+                <input
+                    type="hidden"
+                    name="fila"
+                    id="edit_fila"
+                >
 
+                <input
+                    type="hidden"
+                    name="serie_original"
+                    id="edit_serie_original"
+                >
+
+                <input
+                    type="hidden"
+                    name="consulta"
+                    id="edit_consulta"
+                    value=""
+                >
+
+                <!-- SERIE -->
                 <div class="campo">
                     <label for="edit_serie">Número de serie</label>
-                    <input type="text" id="edit_serie" name="serie" required>
+
+                    <input
+                        type="text"
+                        id="edit_serie"
+                        name="serie"
+                        required
+                    >
                 </div>
 
+                <!-- ESTADO -->
                 <div class="campo">
                     <label for="edit_estado">Estado</label>
-                    <select id="edit_estado" name="estado" required>
-                        <option value="">Seleccionar...</option>
-                        <option value="LOCALIZADO">LOCALIZADO</option>
-                        <option value="NO LOCALIZADO">NO LOCALIZADO</option>
-                        <option value="EXTRAVIADO">EXTRAVIADO</option>
-                    </select>
+
+                    <input
+                        type="text"
+                        id="edit_estado"
+                        name="estado"
+                        list="lista_estado"
+                        required
+                    >
                 </div>
 
+                <!-- UBICACIÓN -->
                 <div class="campo">
-                    <label for="edit_ubicacion">Control de ubicación</label>
-                    <input type="text" id="edit_ubicacion" name="ubicacion" list="lista_ubicacion" required>
+                    <label for="edit_ubicacion">
+                        Control de ubicación
+                    </label>
+
+                    <input
+                        type="text"
+                        id="edit_ubicacion"
+                        name="ubicacion"
+                        list="lista_ubicacion"
+                        required
+                    >
                 </div>
 
+                <!-- USUARIO -->
                 <div class="campo">
-                    <label for="edit_usuario">Usuario asignado</label>
-                    <input type="text" id="edit_usuario" name="usuario_asignado">
+                    <label for="edit_usuario">
+                        Usuario asignado
+                    </label>
+
+                    <input
+                        type="text"
+                        id="edit_usuario"
+                        name="usuario_asignado"
+                    >
                 </div>
 
+                <!-- ACCESORIO -->
                 <div class="campo">
                     <label for="edit_accesorio">Accesorio</label>
-                    <input type="text" id="edit_accesorio" name="accesorio" list="lista_accesorio">
+
+                    <input
+                        type="text"
+                        id="edit_accesorio"
+                        name="accesorio"
+                        list="lista_accesorio"
+                    >
                 </div>
 
+                <!-- CONDICIÓN -->
                 <div class="campo">
-                    <label for="edit_reasignacion">Condición de reasignación</label>
-                    <input type="text" id="edit_reasignacion" name="reasignacion" list="lista_reasignacion">
+                    <label for="edit_condicion">
+                        Condición del colector
+                    </label>
+
+                    <input
+                        type="text"
+                        id="edit_condicion"
+                        name="condicion"
+                        list="lista_condicion"
+                    >
                 </div>
 
-                <div class="campo">
-                    <label for="edit_condicion">Condición del colector</label>
-                    <input type="text" id="edit_condicion" name="condicion" list="lista_condicion">
-                </div>
-
+                <!-- OBSERVACIÓN -->
                 <div class="campo campo-completo">
-                    <label for="edit_observacion">Observación</label>
-                    <textarea id="edit_observacion" name="observacion" rows="3"></textarea>
+                    <label for="edit_observacion">
+                        Observación
+                    </label>
+
+                    <textarea
+                        id="edit_observacion"
+                        name="observacion"
+                        rows="3"
+                    ></textarea>
                 </div>
 
+                <!-- BOTONES -->
                 <div class="acciones-form campo-completo">
-                    <button type="button" class="btn-secundario" id="cancelarModal">Cancelar</button>
-                    <button type="submit" class="btn-guardar">Guardar cambios</button>
+
+                    <button
+                        type="button"
+                        class="btn-secundario"
+                        id="cancelarModal"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn-guardar"
+                    >
+                        Guardar cambios
+                    </button>
+
                 </div>
+
             </form>
+
         </div>
+
     </div>
 
+    <!-- JAVASCRIPT -->
     <script>
-       const buscador = document.getElementById("buscarTabla");
-const tabla = document.getElementById("tablaColectores");
-const contador = document.getElementById("contadorFilas");
 
-buscador.addEventListener("input", function () {
+        // ==========================================
+        // BUSCADOR EN TIEMPO REAL
+        // ==========================================
 
-    const textoBuscado = this.value
-        .trim()
-        .toLowerCase();
+        const buscador = document.getElementById("buscarTabla");
+        const tabla = document.getElementById("tablaColectores");
+        const contador = document.getElementById("contadorFilas");
 
-    const filas = tabla.querySelectorAll("tbody tr");
+        function filtrarTabla() {
 
-    let visibles = 0;
+            const textoBuscado = buscador.value
+                .trim()
+                .toLocaleLowerCase("es");
 
-    filas.forEach(function (fila) {
+            const filas = tabla.querySelectorAll("tbody tr");
 
-        if (fila.querySelector(".sin-registros")) {
-            return;
+            let visibles = 0;
+
+            filas.forEach(function (fila) {
+
+                if (fila.querySelector(".sin-registros")) {
+                    return;
+                }
+
+                const contenido = fila.textContent
+                    .toLocaleLowerCase("es");
+
+                const coincide = contenido.includes(textoBuscado);
+
+                fila.style.display = coincide ? "" : "none";
+
+                if (coincide) {
+                    visibles++;
+                }
+
+            });
+
+            contador.textContent =
+                "Mostrando " +
+                visibles +
+                (visibles === 1 ? " registro" : " registros");
+
         }
 
-        // Busca en TODAS las columnas
-        const contenido = fila.textContent
-            .toLowerCase();
+        buscador.addEventListener("input", filtrarTabla);
 
-        if (contenido.indexOf(textoBuscado) !== -1) {
-            fila.style.display = "";
-            visibles++;
-        } else {
-            fila.style.display = "none";
-        }
 
-    });
-
-    contador.textContent =
-        "Mostrando " +
-        visibles +
-        (visibles === 1 ? " registro" : " registros");
-
-});
+        // ==========================================
+        // MODAL DE EDICIÓN
+        // ==========================================
 
         const modal = document.getElementById("modalEdicion");
         const cerrarModal = document.getElementById("cerrarModal");
         const cancelarModal = document.getElementById("cancelarModal");
 
-        document.querySelectorAll(".btn-editar").forEach(boton => {
-            boton.addEventListener("click", () => {
-                document.getElementById("edit_fila").value = boton.dataset.fila;
-                document.getElementById("edit_item").value = boton.dataset.item;
-                document.getElementById("edit_serie").value = boton.dataset.serie;
-                document.getElementById("edit_serie_original").value = boton.dataset.serie;
-                document.getElementById("edit_estado").value = boton.dataset.estado;
-                document.getElementById("edit_ubicacion").value = boton.dataset.ubicacion;
-                document.getElementById("edit_usuario").value = boton.dataset.usuario;
-                document.getElementById("edit_accesorio").value = boton.dataset.accesorio;
-                document.getElementById("edit_reasignacion").value = boton.dataset.reasignacion;
-                document.getElementById("edit_condicion").value = boton.dataset.condicion;
-                document.getElementById("edit_observacion").value = boton.dataset.observacion;
+        let ultimoBotonEdicion = null;
 
-                modal.classList.add("activo");
-                modal.setAttribute("aria-hidden", "false");
-                document.body.classList.add("modal-abierto");
+        function abrirEdicion(boton) {
+
+            ultimoBotonEdicion = boton;
+
+            document.getElementById("edit_fila").value =
+                boton.dataset.fila || "";
+
+            document.getElementById("edit_serie").value =
+                boton.dataset.serie || "";
+
+            document.getElementById("edit_serie_original").value =
+                boton.dataset.serie || "";
+
+            document.getElementById("edit_estado").value =
+                boton.dataset.estado || "";
+
+            document.getElementById("edit_ubicacion").value =
+                boton.dataset.ubicacion || "";
+
+            document.getElementById("edit_usuario").value =
+                boton.dataset.usuario || "";
+
+            document.getElementById("edit_accesorio").value =
+                boton.dataset.accesorio || "";
+
+            document.getElementById("edit_condicion").value =
+                boton.dataset.condicion || "";
+
+            document.getElementById("edit_observacion").value =
+                boton.dataset.observacion || "";
+
+            document.getElementById("edit_consulta").value =
+                boton.dataset.serie || "";
+
+            modal.classList.add("activo");
+            modal.setAttribute("aria-hidden", "false");
+
+            document.body.classList.add("modal-abierto");
+
+            document.getElementById("edit_serie").focus();
+
+        }
+
+        document.querySelectorAll(".btn-editar").forEach(function (boton) {
+
+            boton.addEventListener("click", function () {
+                abrirEdicion(boton);
             });
+
         });
 
         function cerrarEdicion() {
+
             modal.classList.remove("activo");
             modal.setAttribute("aria-hidden", "true");
+
             document.body.classList.remove("modal-abierto");
+
+            if (ultimoBotonEdicion) {
+                ultimoBotonEdicion.focus();
+            }
+
         }
 
         cerrarModal.addEventListener("click", cerrarEdicion);
         cancelarModal.addEventListener("click", cerrarEdicion);
 
-        modal.addEventListener("click", e => {
-            if (e.target === modal) cerrarEdicion();
+        modal.addEventListener("click", function (evento) {
+
+            if (evento.target === modal) {
+                cerrarEdicion();
+            }
+
         });
 
-        document.addEventListener("keydown", e => {
-            if (e.key === "Escape") cerrarEdicion();
+        document.addEventListener("keydown", function (evento) {
+
+            if (
+                evento.key === "Escape" &&
+                modal.classList.contains("activo")
+            ) {
+                cerrarEdicion();
+            }
+
         });
 
-        function confirmarEliminacion(formulario) {
-            return confirm("¿Seguro que querés eliminar este colector? Esta acción también lo elimina de Google Sheets.");
+
+        // ==========================================
+        // CONFIRMAR ELIMINACIÓN
+        // ==========================================
+
+        function confirmarEliminacion() {
+
+            return confirm(
+                "¿Seguro que querés eliminar este colector?\n\n" +
+                "Esta acción también eliminará el registro de Google Sheets."
+            );
+
         }
 
-        const btnVerUbicaciones = document.getElementById("btnVerUbicaciones");
-        const extras = document.querySelectorAll(".ubicacion-extra");
+
+        // ==========================================
+        // MOSTRAR TODAS LAS UBICACIONES
+        // ==========================================
+
+        const btnVerUbicaciones =
+            document.getElementById("btnVerUbicaciones");
+
+        const extras =
+            document.querySelectorAll(".ubicacion-extra");
+
         let mostrandoTodas = false;
 
         if (extras.length === 0) {
             btnVerUbicaciones.style.display = "none";
         }
 
-        btnVerUbicaciones.addEventListener("click", () => {
+        btnVerUbicaciones.addEventListener("click", function () {
+
             mostrandoTodas = !mostrandoTodas;
 
-            extras.forEach(card => {
-                card.classList.toggle("oculto", !mostrandoTodas);
+            extras.forEach(function (tarjeta) {
+
+                tarjeta.classList.toggle(
+                    "oculto",
+                    !mostrandoTodas
+                );
+
             });
 
-            btnVerUbicaciones.textContent = mostrandoTodas ? "Ver menos" : "Ver todas";
+            btnVerUbicaciones.textContent =
+                mostrandoTodas ? "Ver menos" : "Ver todas";
+
         });
+
     </script>
+
 </body>
 </html>
