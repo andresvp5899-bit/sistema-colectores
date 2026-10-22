@@ -1,4 +1,3 @@
-
 # ============================================================
 # SISTEMA DE INVENTARIO DE COLECTORES
 # ACCESO DIRECTO SIN INICIO DE SESIÓN
@@ -953,12 +952,9 @@ def editar_colector():
             "error"
         )
 
-    return redirect(
-        url_for(
-            "buscar_colector",
-            consulta=serie
-        )
-    )
+    # Volver al inventario completo después de editar.
+    # Los 254 registros siguen disponibles; no filtrar por serie.
+    return redirect(url_for("inicio"))
 
 
 # ============================================================
